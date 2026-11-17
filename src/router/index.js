@@ -8,7 +8,15 @@ import CheckInicioView from '../views/CheckInicioView.vue';
 import ActivacionEquiposView from '../views/ActivacionEquiposView.vue';
 import CoberturaWifiView from '../views/CoberturaWifiView.vue';
 import InventarioView from '../views/InventarioView.vue';
+import InventarioDetalleView from '../views/InventarioDetalleView.vue';
+import InventarioAccionesView from '../views/InventarioAccionesView.vue';
 import ComandosActivacionView from '../views/ComandosActivacionView.vue';
+import SoftCloseView from '../views/SoftCloseView.vue';
+import ActivarRutaView from '../views/ActivarRutaView.vue';
+import ComenzarActividadAlmacenView from '../views/ComenzarActividadAlmacenView.vue';
+import FinalizarActividadAlmacenView from '../views/FinalizarActividadAlmacenView.vue';
+import DesplazamientoWazeView from '../views/DesplazamientoWazeView.vue';
+import DesplazamientoMapsView from '../views/DesplazamientoMapsView.vue';
 import ChatView from '../views/ChatView.vue';
 
 const routes = [
@@ -57,9 +65,49 @@ const routes = [
     component: InventarioView
   },
   {
+    path: '/inventario-detalle',
+    name: 'inventario-detalle',
+    component: InventarioDetalleView
+  },
+  {
+    path: '/inventario-acciones',
+    name: 'inventario-acciones',
+    component: InventarioAccionesView
+  },
+  {
     path: '/comandos-act',
     name: 'comandos-act',
     component: ComandosActivacionView
+  },
+  {
+    path: '/softclose',
+    name: 'softclose',
+    component: SoftCloseView
+  },
+  {
+    path: '/activar-ruta',
+    name: 'activar-ruta',
+    component: ActivarRutaView
+  },
+  {
+    path: '/comenzar-actividad',
+    name: 'comenzar-actividad',
+    component: ComenzarActividadAlmacenView
+  },
+  {
+    path: '/finalizar-actividad',
+    name: 'finalizar-actividad',
+    component: FinalizarActividadAlmacenView
+  },
+  {
+    path: '/desplazamiento-waze',
+    name: 'desplazamiento-waze',
+    component: DesplazamientoWazeView
+  },
+  {
+    path: '/desplazamiento-maps',
+    name: 'desplazamiento-maps',
+    component: DesplazamientoMapsView
   },
   {
     path: '/chat',

@@ -212,11 +212,31 @@
 
         <!-- Opciones dinámicas para Almacén -->
         <template v-if="act.tipo === 'almacen'">
-          <div v-if="act.estado === 'pendiente'" class="context-menu-item" @click="handleAction('iniciar_almacen')">Iniciar</div>
+          <div
+            v-if="act.estado === 'pendiente'"
+            class="context-menu-item"
+            :class="{ 'item-target-highlight': currentAlmacenStep === 2 }"
+            @click="handleAction('iniciar_almacen')"
+          >
+            Iniciar
+          </div>
           <template v-else-if="act.estado === 'comenzado'">
-            <div class="context-menu-item" @click="handleAction('completar')">Completar</div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': currentAlmacenStep === 7 && state.almacenProgress?.checkRealizado }"
+              @click="handleAction('completar_almacen')"
+            >
+              Completar
+            </div>
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
-            <div class="context-menu-item" style="color:#ffd54f;font-weight:700;" @click="handleAction('check_inicio')">Check Inicio Operación</div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': currentAlmacenStep === 5 && !state.almacenProgress?.checkRealizado }"
+              style="color:#ffd54f;font-weight:700;"
+              @click="handleAction('check_inicio')"
+            >
+              Check Inicio Operación
+            </div>
             <div class="context-menu-item" @click="handleAction('ajustar_tiempo')">Ajustar tiempo</div>
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
@@ -232,10 +252,28 @@
         <!-- Opciones dinámicas para Cliente -->
         <template v-else>
           <template v-if="act.estado === 'pendiente'">
-            <div class="context-menu-item" style="color:#00e5ff;font-weight:700;" @click="handleAction('iniciar_ruta')">🚗 Iniciar ruta (Desplazamiento)</div>
+            <div class="context-menu-item" style="color:#00e5ff;font-weight:700;" @click="handleAction('iniciar_ruta')">🚗 Iniciar</div>
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
-            <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
+            <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
+            <div class="context-menu-item" @click="handleAction('ir_a')">Ir a</div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': currentDesplazamientoStep === 2 }"
+              @click="handleAction('mapa')"
+            >
+              Mapa
+            </div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': currentDesplazamientoStep === 3 }"
+              @click="handleAction('navegacion')"
+            >
+              Navegación
+            </div>
+            <div class="context-menu-item" @click="handleAction('falla_masiva')">Verifica Falla Masiva</div>
+            <div class="context-menu-item" @click="handleAction('incidente')">Consulta Incidente</div>
+            <div class="context-menu-item" @click="handleAction('verificacion')">Verificacion Cliente</div>
           </template>
           <template v-else-if="act.estado === 'en-ruta' || act.estado === 'en_ruta'">
             <div class="context-menu-item" style="color:#76ff03;font-weight:700;" @click="handleAction('iniciar_predio')">🟢 Iniciar actividad (Llegada al predio)</div>
@@ -252,17 +290,82 @@
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
             <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': state.softCloseProgress?.iniciado && state.softCloseProgress?.currentStep === 18 }"
+              style="color:#e53935;font-weight:700;"
+              @click="handleAction('softclose')"
+            >
+              SoftClose
+            </div>
             <div class="context-menu-item" @click="handleAction('verificacion')">Verificacion Cliente</div>
           </template>
           <template v-else>
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
             <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
+            <div
+              class="context-menu-item"
+              style="color:#e53935;font-weight:700;"
+              @click="handleAction('softclose')"
+            >
+              SoftClose
+            </div>
             <div class="context-menu-item" @click="handleAction('verificacion')">Verificacion Cliente</div>
           </template>
         </template>
       </div>
     </div>
+
+    <!-- PISTAS FLOTANTES DEL PROCESO DE ACTIVIDADES DE ALMACÉN -->
+    <!-- Paso 2 (ACTIVIDADES ALMACEN.pdf Pág 4) -->
+    <FlowHintBox
+      v-if="act.tipo === 'almacen' && act.estado === 'pendiente' && currentAlmacenStep === 2"
+      step="2"
+    >
+      En el menú de tres puntos (...) de la esquina superior derecha, pulsa <strong>Iniciar</strong>.
+    </FlowHintBox>
+
+    <!-- Paso 5 (ACTIVIDADES ALMACEN.pdf Pág 10) -->
+    <FlowHintBox
+      v-else-if="act.tipo === 'almacen' && act.estado === 'comenzado' && currentAlmacenStep === 5"
+      step="5"
+    >
+      En el menú de tres puntos (...), pulsa <strong>Check Inicio Operación</strong>.
+    </FlowHintBox>
+
+    <!-- Paso 7 (ACTIVIDADES ALMACEN.pdf Pág 14) -->
+    <FlowHintBox
+      v-else-if="act.tipo === 'almacen' && act.estado === 'comenzado' && currentAlmacenStep === 7"
+      step="7"
+    >
+      En el menú de tres puntos (...), pulsa <strong>Completar</strong> para finalizar la actividad de almacén.
+    </FlowHintBox>
+
+    <!-- PISTAS FLOTANTES DEL PROCESO DE DESPLAZAMIENTO -->
+    <!-- Paso 2 (DESPLAZAMIENTO.pdf Pág 3) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && currentDesplazamientoStep === 2"
+      step="2"
+    >
+      En el menú desplegable, pulsa la opción <strong>Mapa</strong> para visualizar el lugar de la visita.
+    </FlowHintBox>
+
+    <!-- Paso 3 (DESPLAZAMIENTO.pdf Pág 5) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && currentDesplazamientoStep === 3"
+      step="3"
+    >
+      También puedes pulsar la opción <strong>Navegación</strong> para visualizar el destino desde la <em>app</em> de tu preferencia.
+    </FlowHintBox>
+
+    <!-- PISTAS FLOTANTES (Solo cuando el usuario está en el proceso de SoftClose en el Paso 18) -->
+    <FlowHintBox
+      v-else-if="state.softCloseProgress?.iniciado && state.softCloseProgress?.currentStep === 18"
+      step="18"
+    >
+      En la OT del cliente, despliega el menú con los tres puntos de la parte superior derecha, y selecciona <strong>SoftClose</strong>.
+    </FlowHintBox>
   </div>
 </template>
 
@@ -270,6 +373,7 @@
 import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
+import FlowHintBox from '../components/FlowHintBox.vue';
 
 const route = useRoute();
 const {
@@ -283,8 +387,14 @@ const {
   showToast,
   iniciarRutaIndividual,
   iniciarActividadPredio,
-  completarActividad
+  completarActividad,
+  advanceSoftCloseStep,
+  advanceAlmacenStep,
+  advanceDesplazamientoStep
 } = useSimulator();
+
+const currentAlmacenStep = computed(() => state.almacenProgress?.currentStep || 1);
+const currentDesplazamientoStep = computed(() => state.desplazamientoProgress?.currentStep || 1);
 
 const syncActivityFromRoute = () => {
   const paramId = route.params.id;
@@ -354,15 +464,30 @@ const handleAction = (actionKey) => {
       break;
 
     case 'iniciar_predio':
-    case 'iniciar_almacen':
       iniciarActividadPredio(current);
       break;
 
+    case 'iniciar_almacen':
+      advanceAlmacenStep(3);
+      showScreen('/comenzar-actividad');
+      break;
+
     case 'completar':
-      completarActividad(current);
+      if (current.tipo === 'almacen') {
+        advanceAlmacenStep(8);
+        showScreen('/finalizar-actividad');
+      } else {
+        completarActividad(current);
+      }
+      break;
+
+    case 'completar_almacen':
+      advanceAlmacenStep(8);
+      showScreen('/finalizar-actividad');
       break;
 
     case 'check_inicio':
+      advanceAlmacenStep(6);
       showScreen('/check-inicio');
       break;
 
@@ -375,7 +500,14 @@ const handleAction = (actionKey) => {
       break;
 
     case 'inventario':
+      state.softCloseProgress.iniciado = true;
+      state.softCloseProgress.currentStep = 4;
       showScreen('/inventario');
+      break;
+
+    case 'softclose':
+      advanceSoftCloseStep(19);
+      showScreen('/softclose');
       break;
 
     case 'ajustar_tiempo':
@@ -467,7 +599,23 @@ const handleAction = (actionKey) => {
       );
       break;
 
+    case 'navegacion':
+      advanceDesplazamientoStep(4);
+      showScreen('/desplazamiento-waze');
+      break;
+
+    case 'ir_a':
+      showToast(`Navegando a: ${(current.direccion || '').replace(/\n/g, ' ')}`);
+      break;
+
+    case 'falla_masiva':
+      showToast('Sin fallas masivas reportadas en el nodo', 'success');
+      break;
+
     case 'mapa':
+      if (currentDesplazamientoStep.value === 2) {
+        advanceDesplazamientoStep(3);
+      }
       openModal(
         'Mapa de Ubicación',
         `<div style="background:#111;border:1px solid #333;border-radius:4px;padding:12px;text-align:center;">
@@ -504,3 +652,12 @@ const handleAction = (actionKey) => {
   }
 };
 </script>
+
+<style scoped>
+.item-target-highlight {
+  background: rgba(198, 40, 40, 0.25) !important;
+  border-left: 3px solid #ef5350 !important;
+  color: #ffcdd2 !important;
+  font-weight: 700 !important;
+}
+</style>
