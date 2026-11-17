@@ -282,7 +282,14 @@
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
           </template>
           <template v-else-if="act.estado === 'comenzado'">
-            <div class="context-menu-item" @click="handleAction('completar')">Completar actividad</div>
+            <div
+              class="context-menu-item"
+              :class="{ 'item-target-highlight': cierreState.currentStep === 3 }"
+              style="color:#d32f2f;font-weight:700;"
+              @click="handleAction('completar')"
+            >
+              Completar
+            </div>
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
             <div class="context-menu-item" style="color:#4fc3f7;font-weight:700;" @click="handleAction('activacion_auto')">Activacion Servicios</div>
             <div class="context-menu-item" @click="handleAction('ajustar_tiempo')">Ajustar tiempo</div>
@@ -366,6 +373,15 @@
     >
       En la OT del cliente, despliega el menú con los tres puntos de la parte superior derecha, y selecciona <strong>SoftClose</strong>.
     </FlowHintBox>
+
+    <!-- Paso 3 (CIERRE OT y RUTA WFM.pdf Pág 1) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && cierreState.currentStep === 3"
+      step="3"
+      title="Paso 3 - Completar OT"
+    >
+      En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
+    </FlowHintBox>
   </div>
 </template>
 
@@ -373,6 +389,7 @@
 import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
+import { useCierreFlow } from '../flows/cierre/useCierreFlow';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const route = useRoute();
@@ -392,6 +409,8 @@ const {
   advanceAlmacenStep,
   advanceDesplazamientoStep
 } = useSimulator();
+
+const { cierreState, advanceCierreStep } = useCierreFlow();
 
 const currentAlmacenStep = computed(() => state.almacenProgress?.currentStep || 1);
 const currentDesplazamientoStep = computed(() => state.desplazamientoProgress?.currentStep || 1);
@@ -477,7 +496,8 @@ const handleAction = (actionKey) => {
         advanceAlmacenStep(8);
         showScreen('/finalizar-actividad');
       } else {
-        completarActividad(current);
+        advanceCierreStep(4);
+        showScreen('/completar-ot');
       }
       break;
 

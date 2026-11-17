@@ -85,6 +85,16 @@ import {
   finalizarDesplazamiento
 } from '../flows/desplazamiento/useDesplazamientoFlow.js';
 
+import {
+  cierreState,
+  resetCierreFlow,
+  setCierreStep,
+  advanceCierreStep,
+  capturarCoordenadasGPS,
+  completarOrdenTrabajo,
+  desactivarRutaTrabajo
+} from '../flows/cierre/useCierreFlow.js';
+
 // Restaurar datos guardados
 function initializeState() {
   const saved = loadStoredData();
@@ -111,6 +121,9 @@ function initializeState() {
     }
     if (saved.desplazamientoProgress !== undefined) {
       Object.assign(desplazamientoState, saved.desplazamientoProgress);
+    }
+    if (saved.cierreProgress !== undefined) {
+      Object.assign(cierreState, saved.cierreProgress);
     }
     if (saved.softCloseProgress !== undefined) {
       Object.assign(softCloseState, saved.softCloseProgress);
@@ -144,6 +157,7 @@ export const state = reactive({
   activacionRuta: activacionRutaState,
   almacen: almacenState,
   desplazamiento: desplazamientoState,
+  cierre: cierreState,
 
   // Getters / Setters de compatibilidad con componentes existentes
   get currentUser() { return authState.currentUser; },
@@ -183,7 +197,8 @@ export const state = reactive({
   get softCloseProgress() { return softCloseState; },
   get activacionRutaProgress() { return activacionRutaState; },
   get almacenProgress() { return almacenState; },
-  get desplazamientoProgress() { return desplazamientoState; }
+  get desplazamientoProgress() { return desplazamientoState; },
+  get cierreProgress() { return cierreState; }
 });
 
 // Guardado reactivo en segundo plano ante cualquier cambio
@@ -198,7 +213,8 @@ watch(
     softCloseState,
     activacionRutaState,
     almacenState,
-    desplazamientoState
+    desplazamientoState,
+    cierreState
   ],
   () => {
     saveStoredData(() => ({
@@ -212,7 +228,8 @@ watch(
       softCloseProgress: softCloseState,
       activacionRutaProgress: activacionRutaState,
       almacenProgress: almacenState,
-      desplazamientoProgress: desplazamientoState
+      desplazamientoProgress: desplazamientoState,
+      cierreProgress: cierreState
     }));
   },
   { deep: true }
@@ -334,6 +351,13 @@ export function useSimulator() {
     advanceDesplazamientoStep,
     iniciarViajeWaze,
     cambiarAGoogleMaps,
-    finalizarDesplazamiento
+    finalizarDesplazamiento,
+    // Métodos de Cierre de OT y Desactivar Ruta
+    resetCierreFlow,
+    setCierreStep,
+    advanceCierreStep,
+    capturarCoordenadasGPS,
+    completarOrdenTrabajo,
+    desactivarRutaTrabajo
   };
 }

@@ -17,6 +17,8 @@ import ComenzarActividadAlmacenView from '../views/ComenzarActividadAlmacenView.
 import FinalizarActividadAlmacenView from '../views/FinalizarActividadAlmacenView.vue';
 import DesplazamientoWazeView from '../views/DesplazamientoWazeView.vue';
 import DesplazamientoMapsView from '../views/DesplazamientoMapsView.vue';
+import FinalizarActividadClienteView from '../views/FinalizarActividadClienteView.vue';
+import DesactivarRutaView from '../views/DesactivarRutaView.vue';
 import ChatView from '../views/ChatView.vue';
 
 const routes = [
@@ -108,6 +110,16 @@ const routes = [
     path: '/desplazamiento-maps',
     name: 'desplazamiento-maps',
     component: DesplazamientoMapsView
+  },
+  {
+    path: '/completar-ot',
+    name: 'completar-ot',
+    component: FinalizarActividadClienteView
+  },
+  {
+    path: '/desactivar-ruta',
+    name: 'desactivar-ruta',
+    component: DesactivarRutaView
   },
   {
     path: '/chat',
