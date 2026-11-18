@@ -95,6 +95,18 @@ import {
   desactivarRutaTrabajo
 } from '../flows/cierre/useCierreFlow.js';
 
+import {
+  planillaNotasState,
+  resetPlanillaNotasFlow,
+  setPlanillaStep,
+  advancePlanillaStep,
+  abrirListaColaboracion,
+  abrirChatDeltaGeneral,
+  abrirInfoUsuario,
+  iniciarConversacionPrivada,
+  enviarMensajePrivado
+} from '../flows/planilla_notas/usePlanillaNotasFlow.js';
+
 // Restaurar datos guardados
 function initializeState() {
   const saved = loadStoredData();
@@ -124,6 +136,9 @@ function initializeState() {
     }
     if (saved.cierreProgress !== undefined) {
       Object.assign(cierreState, saved.cierreProgress);
+    }
+    if (saved.planillaNotasProgress !== undefined) {
+      Object.assign(planillaNotasState, saved.planillaNotasProgress);
     }
     if (saved.softCloseProgress !== undefined) {
       Object.assign(softCloseState, saved.softCloseProgress);
@@ -158,6 +173,7 @@ export const state = reactive({
   almacen: almacenState,
   desplazamiento: desplazamientoState,
   cierre: cierreState,
+  planillaNotas: planillaNotasState,
 
   // Getters / Setters de compatibilidad con componentes existentes
   get currentUser() { return authState.currentUser; },
@@ -198,7 +214,8 @@ export const state = reactive({
   get activacionRutaProgress() { return activacionRutaState; },
   get almacenProgress() { return almacenState; },
   get desplazamientoProgress() { return desplazamientoState; },
-  get cierreProgress() { return cierreState; }
+  get cierreProgress() { return cierreState; },
+  get planillaNotasProgress() { return planillaNotasState; }
 });
 
 // Guardado reactivo en segundo plano ante cualquier cambio
@@ -214,7 +231,8 @@ watch(
     activacionRutaState,
     almacenState,
     desplazamientoState,
-    cierreState
+    cierreState,
+    planillaNotasState
   ],
   () => {
     saveStoredData(() => ({
@@ -229,7 +247,8 @@ watch(
       activacionRutaProgress: activacionRutaState,
       almacenProgress: almacenState,
       desplazamientoProgress: desplazamientoState,
-      cierreProgress: cierreState
+      cierreProgress: cierreState,
+      planillaNotasProgress: planillaNotasState
     }));
   },
   { deep: true }
@@ -358,6 +377,15 @@ export function useSimulator() {
     advanceCierreStep,
     capturarCoordenadasGPS,
     completarOrdenTrabajo,
-    desactivarRutaTrabajo
+    desactivarRutaTrabajo,
+    // Métodos de Planilla de Notas y Colaboración
+    resetPlanillaNotasFlow,
+    setPlanillaStep,
+    advancePlanillaStep,
+    abrirListaColaboracion,
+    abrirChatDeltaGeneral,
+    abrirInfoUsuario,
+    iniciarConversacionPrivada,
+    enviarMensajePrivado
   };
 }
