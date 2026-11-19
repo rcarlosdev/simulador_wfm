@@ -2793,3 +2793,41 @@ button,
   }
 }
 
+/* ====================================================================
+   MODO LIBRE / EVALUACIÓN: Desactiva todas las ayudas y pistas visuales
+   ==================================================================== */
+.mode-libre .target-highlight,
+.mode-libre .item-target-highlight,
+.mode-libre .card-target-highlight,
+.mode-libre .btn-tutorial-highlight,
+.mode-libre .side-tutorial-highlight,
+.mode-libre .grid-target-highlight,
+.mode-libre .plan-tutorial-highlight,
+.mode-libre .dialog-tutorial-highlight,
+.mode-libre .card-tutorial-highlight,
+.mode-libre .day-active-target,
+.mode-libre .item-target {
+  animation: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.mode-libre .target-highlight,
+.mode-libre .card-target-highlight,
+.mode-libre .btn-tutorial-highlight,
+.mode-libre .side-tutorial-highlight,
+.mode-libre .item-target-highlight {
+  background: transparent !important;
+}
+
+.mode-libre .btn-tutorial-highlight .btn-nuevo-label,
+.mode-libre .btn-tutorial-highlight .svg-chat-plus,
+.mode-libre .btn-tutorial-highlight .svg-chat-dots {
+  color: inherit !important;
+}
+
+.mode-libre .flow-hint-wrapper {
+  display: none !important;
+}
+
+

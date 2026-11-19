@@ -9,12 +9,17 @@
         <button type="button" class="app-bar-btn" title="Buscar" @click="showToast('Búsqueda rápida activada')">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         </button>
-        <div class="chat-badge-container btn-open-chat" title="Chat" @click="showScreen('/chat')">
+        <div
+          class="chat-badge-container btn-open-chat"
+          :class="{ 'target-highlight': act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2 }"
+          title="Colaboración / Mensajería"
+          @click="irAColaboracion"
+        >
           <button type="button" class="app-bar-btn" style="padding:2px 4px;">
             <svg viewBox="0 0 24 24" style="width:22px;height:22px;"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-            <span class="chat-badge">2</span>
+            <span class="chat-badge">6</span>
           </button>
-          <span class="chat-timer-label">{{ state.chatTimerStr }}</span>
+          <span class="chat-timer-label">{{ state.chatTimerStr || '19:40' }}</span>
         </div>
       </div>
     </div>
@@ -46,7 +51,16 @@
           <span class="timer-badge-val">En ejecución: {{ formatDuration(act.actElapsedSec || 0) }}</span>
         </div>
 
-        <button type="button" class="btn-dots-menu" title="Opciones (...)" @click.stop="toggleContextMenu">
+        <button
+          type="button"
+          class="btn-dots-menu"
+          :class="{
+            'target-highlight': (act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1) ||
+                                (act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3)
+          }"
+          title="Opciones (...)"
+          @click.stop="handleToggleContextMenu"
+        >
           <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
         </button>
       </div>
@@ -282,11 +296,29 @@
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
           </template>
           <template v-else-if="act.estado === 'comenzado'">
-            <div class="context-menu-item" @click="handleAction('completar')">Completar actividad</div>
+            <div
+              class="context-menu-item"
+              :class="{
+                'item-target-highlight': mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3
+              }"
+              style="color:#d32f2f;font-weight:700;"
+              @click="handleAction('completar')"
+            >
+              Completar
+            </div>
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
             <div class="context-menu-item" style="color:#4fc3f7;font-weight:700;" @click="handleAction('activacion_auto')">Activacion Servicios</div>
             <div class="context-menu-item" @click="handleAction('ajustar_tiempo')">Ajustar tiempo</div>
-            <div class="context-menu-item" style="color:#81c784;font-weight:700;" @click="handleAction('cobertura_wifi')">Cobertura Wifi</div>
+            <div
+              class="context-menu-item"
+              :class="{
+                'item-target-highlight': act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2
+              }"
+              style="color:#81c784;font-weight:700;"
+              @click="handleAction('cobertura_wifi')"
+            >
+              Cobertura Wifi
+            </div>
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
             <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
@@ -366,6 +398,45 @@
     >
       En la OT del cliente, despliega el menú con los tres puntos de la parte superior derecha, y selecciona <strong>SoftClose</strong>.
     </FlowHintBox>
+
+    <!-- ====================================================================
+         SECUENCIA OPERATIVA: MAPA DE CALOR -> PLANILLA DE NOTAS -> CIERRE OT
+         ==================================================================== -->
+    <!-- 1. Paso 1 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 1) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1 && !state.contextMenuOpen"
+      step="1"
+      title="Paso 1 - Menú de Opciones"
+    >
+      En la pantalla <strong>Detalles de actividad</strong>, despliega el menú presionando los <strong>tres puntos</strong> ubicados en la parte superior derecha.
+    </FlowHintBox>
+
+    <!-- 1. Paso 2 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 2) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2 && state.contextMenuOpen"
+      step="2"
+      title="Paso 2 - Cobertura Wifi"
+    >
+      En el menú desplegado, selecciona la opción <strong>Cobertura wifi</strong>.
+    </FlowHintBox>
+
+    <!-- 2. Paso 2 Planilla de Notas (PLANILLA DE NOTAS.pdf Pág 1) - Tras certificar Cobertura WiFi -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2"
+      step="2"
+      title="Paso 2 - Plantilla de Notas"
+    >
+      Para acceder a la plantilla de notas, pulsa el <strong>botón de mensajería</strong> ubicado en la parte superior derecha.
+    </FlowHintBox>
+
+    <!-- 3. Paso 3 Cierre de OT (CIERRE OT y RUTA WFM.pdf Pág 1) - Tras enviar Planilla de Notas -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3"
+      step="3"
+      title="Paso 3 - Completar OT"
+    >
+      En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
+    </FlowHintBox>
   </div>
 </template>
 
@@ -373,6 +444,9 @@
 import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
+import { useCierreFlow } from '../flows/cierre/useCierreFlow';
+import { usePlanillaNotasFlow } from '../flows/planilla_notas/usePlanillaNotasFlow';
+import { useMapaCalorFlow } from '../flows/mapa_calor/useMapaCalorFlow';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const route = useRoute();
@@ -392,6 +466,25 @@ const {
   advanceAlmacenStep,
   advanceDesplazamientoStep
 } = useSimulator();
+
+const { cierreState, advanceCierreStep } = useCierreFlow();
+const { planillaNotasState, advancePlanillaStep, abrirListaColaboracion } = usePlanillaNotasFlow();
+const { mapaCalorState, abrirMenuDetalles, abrirCoberturaWifi } = useMapaCalorFlow();
+
+const currentPlanillaStep = computed(() => planillaNotasState.currentStep);
+const currentMapaCalorStep = computed(() => mapaCalorState.currentStep);
+
+const handleToggleContextMenu = () => {
+  if (currentMapaCalorStep.value === 1 && act.value?.estado === 'comenzado') {
+    abrirMenuDetalles();
+  }
+  toggleContextMenu();
+};
+
+const irAColaboracion = () => {
+  abrirListaColaboracion();
+  showScreen('/chat');
+};
 
 const currentAlmacenStep = computed(() => state.almacenProgress?.currentStep || 1);
 const currentDesplazamientoStep = computed(() => state.desplazamientoProgress?.currentStep || 1);
@@ -477,7 +570,8 @@ const handleAction = (actionKey) => {
         advanceAlmacenStep(8);
         showScreen('/finalizar-actividad');
       } else {
-        completarActividad(current);
+        advanceCierreStep(4);
+        showScreen('/completar-ot');
       }
       break;
 
@@ -496,6 +590,7 @@ const handleAction = (actionKey) => {
       break;
 
     case 'cobertura_wifi':
+      abrirCoberturaWifi();
       showScreen('/cobertura-wifi');
       break;
 

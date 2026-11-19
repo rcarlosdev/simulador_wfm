@@ -43,7 +43,7 @@
           type="button"
           class="btn-dots-menu"
           :class="{
-            'target-highlight': (!rutaActivada && currentRutaStep === 4) || (actAlmacen?.estado === 'cerrado' && currentDesplazamientoStep === 1)
+            'target-highlight': (!rutaActivada && currentRutaStep === 4) || (actAlmacen?.estado === 'cerrado' && currentDesplazamientoStep === 1) || (cierreState.otCompletada && !cierreState.rutaDesactivada)
           }"
           title="Opciones de Lista"
           @click.stop="toggleMenuLista"
@@ -52,14 +52,24 @@
         </button>
       </div>
 
-      <!-- Menú Desplegable de Tres Puntos Oficial (Páginas 5 y 6 del PDF) -->
+      <!-- Menú Desplegable de Tres Puntos Oficial (Páginas 5 y 6 del PDF / Desactivar Ruta Pág 9) -->
       <div v-if="menuListaAbierto" class="list-dropdown-menu" @click.stop>
         <div
+          v-if="!rutaActivada"
           class="list-dropdown-item"
-          :class="{ 'item-target': currentRutaStep === 4 && !rutaActivada }"
+          :class="{ 'item-target': currentRutaStep === 4 }"
           @click="irAActivarRuta"
         >
           Activar ruta
+        </div>
+        <div
+          v-else-if="cierreState.otCompletada && !cierreState.rutaDesactivada"
+          class="list-dropdown-item"
+          :class="{ 'item-target': cierreState.otCompletada }"
+          style="color:#d32f2f;font-weight:700;"
+          @click="irADesactivarRuta"
+        >
+          Desactivar Ruta
         </div>
         <div class="list-dropdown-item" @click="verMapa">
           Mapa
@@ -323,12 +333,22 @@
     >
       El aplicativo actualizará los cambios realizados en la OT. Después, en <strong>Lista de actividades</strong>, selecciona la OT del cliente.
     </FlowHintBox>
+
+    <!-- Paso 5 (CIERRE OT y RUTA WFM.pdf Pág 8-9) -->
+    <FlowHintBox
+      v-else-if="cierreState.otCompletada && !cierreState.rutaDesactivada"
+      step="5"
+      title="Paso 5 - Desactivar Ruta"
+    >
+      Todas tus actividades han finalizado. Pulsa los tres puntos (···) de la parte superior derecha y selecciona <strong>Desactivar Ruta</strong>.
+    </FlowHintBox>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
+import { useCierreFlow } from '../flows/cierre/useCierreFlow';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const {
@@ -342,6 +362,8 @@ const {
   advanceAlmacenStep,
   advanceDesplazamientoStep
 } = useSimulator();
+
+const { cierreState, advanceCierreStep } = useCierreFlow();
 
 const collapsed = ref({
   pendiente: false,
@@ -458,6 +480,12 @@ const irAActivarRuta = () => {
     state.activacionRutaProgress.currentStep = 5;
   }
   showScreen('/activar-ruta');
+};
+
+const irADesactivarRuta = () => {
+  menuListaAbierto.value = false;
+  advanceCierreStep(6);
+  showScreen('/desactivar-ruta');
 };
 
 const verMapa = () => {

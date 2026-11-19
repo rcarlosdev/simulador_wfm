@@ -35,7 +35,9 @@ import {
   toggleContextMenu,
   openColorimetria,
   closeColorimetria,
-  toggleFullscreen
+  toggleFullscreen,
+  setModoGuiado,
+  toggleModoGuiado
 } from '../core/ui.js';
 import { chatState, tickChatTimer, sendChatMessage } from '../core/chat.js';
 
@@ -85,6 +87,33 @@ import {
   finalizarDesplazamiento
 } from '../flows/desplazamiento/useDesplazamientoFlow.js';
 
+import {
+  cierreState,
+  resetCierreFlow,
+  setCierreStep,
+  advanceCierreStep,
+  capturarCoordenadasGPS,
+  completarOrdenTrabajo,
+  desactivarRutaTrabajo
+} from '../flows/cierre/useCierreFlow.js';
+
+import {
+  planillaNotasState,
+  resetPlanillaNotasFlow,
+  setPlanillaStep,
+  advancePlanillaStep,
+  abrirListaColaboracion,
+  abrirChatDeltaGeneral,
+  abrirInfoUsuario,
+  iniciarConversacionPrivada,
+  enviarMensajePrivado
+} from '../flows/planilla_notas/usePlanillaNotasFlow.js';
+
+import {
+  mapaCalorState,
+  useMapaCalorFlow
+} from '../flows/mapa_calor/useMapaCalorFlow.js';
+
 // Restaurar datos guardados
 function initializeState() {
   const saved = loadStoredData();
@@ -92,6 +121,7 @@ function initializeState() {
     if (saved.currentUser !== undefined) authState.currentUser = saved.currentUser;
     if (saved.currentActivityId !== undefined) activitiesState.currentActivityId = saved.currentActivityId;
     if (saved.fullscreen !== undefined) uiState.fullscreen = saved.fullscreen;
+    if (saved.modoGuiado !== undefined) uiState.modoGuiado = saved.modoGuiado;
     if (saved.timerSeconds !== undefined) chatState.timerSeconds = saved.timerSeconds;
     if (saved.chatTimerStr !== undefined) chatState.chatTimerStr = saved.chatTimerStr;
     if (saved.chatMessages !== undefined) chatState.chatMessages = saved.chatMessages;
@@ -111,6 +141,15 @@ function initializeState() {
     }
     if (saved.desplazamientoProgress !== undefined) {
       Object.assign(desplazamientoState, saved.desplazamientoProgress);
+    }
+    if (saved.cierreProgress !== undefined) {
+      Object.assign(cierreState, saved.cierreProgress);
+    }
+    if (saved.planillaNotasProgress !== undefined) {
+      Object.assign(planillaNotasState, saved.planillaNotasProgress);
+    }
+    if (saved.mapaCalorProgress !== undefined) {
+      Object.assign(mapaCalorState, saved.mapaCalorProgress);
     }
     if (saved.softCloseProgress !== undefined) {
       Object.assign(softCloseState, saved.softCloseProgress);
@@ -144,6 +183,9 @@ export const state = reactive({
   activacionRuta: activacionRutaState,
   almacen: almacenState,
   desplazamiento: desplazamientoState,
+  cierre: cierreState,
+  planillaNotas: planillaNotasState,
+  mapaCalor: mapaCalorState,
 
   // Getters / Setters de compatibilidad con componentes existentes
   get currentUser() { return authState.currentUser; },
@@ -157,6 +199,9 @@ export const state = reactive({
 
   get fullscreen() { return uiState.fullscreen; },
   set fullscreen(v) { uiState.fullscreen = v; },
+
+  get modoGuiado() { return uiState.modoGuiado; },
+  set modoGuiado(v) { uiState.modoGuiado = v; },
 
   get clockTime() { return uiState.clockTime; },
   set clockTime(v) { uiState.clockTime = v; },
@@ -183,7 +228,10 @@ export const state = reactive({
   get softCloseProgress() { return softCloseState; },
   get activacionRutaProgress() { return activacionRutaState; },
   get almacenProgress() { return almacenState; },
-  get desplazamientoProgress() { return desplazamientoState; }
+  get desplazamientoProgress() { return desplazamientoState; },
+  get cierreProgress() { return cierreState; },
+  get planillaNotasProgress() { return planillaNotasState; },
+  get mapaCalorProgress() { return mapaCalorState; }
 });
 
 // Guardado reactivo en segundo plano ante cualquier cambio
@@ -193,18 +241,23 @@ watch(
     activitiesState.currentActivity,
     activitiesState.currentActivityId,
     uiState.fullscreen,
+    uiState.modoGuiado,
     chatState.chatMessages,
     activacionState,
     softCloseState,
     activacionRutaState,
     almacenState,
-    desplazamientoState
+    desplazamientoState,
+    cierreState,
+    planillaNotasState,
+    mapaCalorState
   ],
   () => {
     saveStoredData(() => ({
       currentUser: authState.currentUser,
       currentActivityId: activitiesState.currentActivity?.id || activitiesState.currentActivityId,
       fullscreen: uiState.fullscreen,
+      modoGuiado: uiState.modoGuiado,
       timerSeconds: chatState.timerSeconds,
       chatTimerStr: chatState.chatTimerStr,
       chatMessages: chatState.chatMessages,
@@ -212,7 +265,10 @@ watch(
       softCloseProgress: softCloseState,
       activacionRutaProgress: activacionRutaState,
       almacenProgress: almacenState,
-      desplazamientoProgress: desplazamientoState
+      desplazamientoProgress: desplazamientoState,
+      cierreProgress: cierreState,
+      planillaNotasProgress: planillaNotasState,
+      mapaCalorProgress: mapaCalorState
     }));
   },
   { deep: true }
@@ -305,6 +361,8 @@ export function useSimulator() {
     openColorimetria,
     closeColorimetria,
     toggleFullscreen,
+    setModoGuiado,
+    toggleModoGuiado,
     selectActivity,
     iniciarRutaIndividual,
     iniciarActividadPredio,
@@ -334,6 +392,25 @@ export function useSimulator() {
     advanceDesplazamientoStep,
     iniciarViajeWaze,
     cambiarAGoogleMaps,
-    finalizarDesplazamiento
+    finalizarDesplazamiento,
+    // Métodos de Cierre de OT y Desactivar Ruta
+    resetCierreFlow,
+    setCierreStep,
+    advanceCierreStep,
+    capturarCoordenadasGPS,
+    completarOrdenTrabajo,
+    desactivarRutaTrabajo,
+    // Métodos de Planilla de Notas y Colaboración
+    resetPlanillaNotasFlow,
+    setPlanillaStep,
+    advancePlanillaStep,
+    abrirListaColaboracion,
+    abrirChatDeltaGeneral,
+    abrirInfoUsuario,
+    iniciarConversacionPrivada,
+    enviarMensajePrivado,
+    // Métodos de Mapa de Calor (App H&B)
+    mapaCalorState,
+    ...useMapaCalorFlow()
   };
 }

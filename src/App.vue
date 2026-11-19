@@ -7,7 +7,10 @@
       <!-- DISPOSITIVO MÓVIL SIMULADO (SMARTPHONE MOCKUP) -->
       <div
         class="device-container"
-        :class="{ 'mode-fullscreen': state.fullscreen }"
+        :class="{
+          'mode-fullscreen': state.fullscreen,
+          'mode-libre': !state.ui.modoGuiado
+        }"
         id="device-container"
       >
         <!-- Barra de Estado Android / Móvil -->
