@@ -162,10 +162,10 @@ function initializeState() {
   }
 
   // Vincular la actividad actual inicial
-  if (authState.currentUser?.actividades?.length > 0) {
-    const found = authState.currentUser.actividades.find(a => a.id === activitiesState.currentActivityId);
+  if (authState?.currentUser?.actividades?.length > 0 && activitiesState) {
+    const found = authState.currentUser.actividades.find(a => a && a.id === activitiesState.currentActivityId);
     activitiesState.currentActivity = found || authState.currentUser.actividades[0];
-    activitiesState.currentActivityId = activitiesState.currentActivity.id;
+    activitiesState.currentActivityId = activitiesState.currentActivity?.id;
   }
 }
 
@@ -237,12 +237,12 @@ export const state = reactive({
 // Guardado reactivo en segundo plano ante cualquier cambio
 watch(
   () => [
-    authState.currentUser,
-    activitiesState.currentActivity,
-    activitiesState.currentActivityId,
-    uiState.fullscreen,
-    uiState.modoGuiado,
-    chatState.chatMessages,
+    authState?.currentUser,
+    activitiesState?.currentActivity,
+    activitiesState?.currentActivityId,
+    uiState?.fullscreen,
+    uiState?.modoGuiado,
+    chatState?.chatMessages,
     activacionState,
     softCloseState,
     activacionRutaState,
@@ -254,13 +254,13 @@ watch(
   ],
   () => {
     saveStoredData(() => ({
-      currentUser: authState.currentUser,
-      currentActivityId: activitiesState.currentActivity?.id || activitiesState.currentActivityId,
-      fullscreen: uiState.fullscreen,
-      modoGuiado: uiState.modoGuiado,
-      timerSeconds: chatState.timerSeconds,
-      chatTimerStr: chatState.chatTimerStr,
-      chatMessages: chatState.chatMessages,
+      currentUser: authState?.currentUser,
+      currentActivityId: activitiesState?.currentActivity?.id || activitiesState?.currentActivityId,
+      fullscreen: uiState?.fullscreen,
+      modoGuiado: uiState?.modoGuiado,
+      timerSeconds: chatState?.timerSeconds,
+      chatTimerStr: chatState?.chatTimerStr,
+      chatMessages: chatState?.chatMessages,
       activacionProgress: activacionState,
       softCloseProgress: softCloseState,
       activacionRutaProgress: activacionRutaState,
