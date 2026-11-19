@@ -35,7 +35,9 @@ import {
   toggleContextMenu,
   openColorimetria,
   closeColorimetria,
-  toggleFullscreen
+  toggleFullscreen,
+  setModoGuiado,
+  toggleModoGuiado
 } from '../core/ui.js';
 import { chatState, tickChatTimer, sendChatMessage } from '../core/chat.js';
 
@@ -119,6 +121,7 @@ function initializeState() {
     if (saved.currentUser !== undefined) authState.currentUser = saved.currentUser;
     if (saved.currentActivityId !== undefined) activitiesState.currentActivityId = saved.currentActivityId;
     if (saved.fullscreen !== undefined) uiState.fullscreen = saved.fullscreen;
+    if (saved.modoGuiado !== undefined) uiState.modoGuiado = saved.modoGuiado;
     if (saved.timerSeconds !== undefined) chatState.timerSeconds = saved.timerSeconds;
     if (saved.chatTimerStr !== undefined) chatState.chatTimerStr = saved.chatTimerStr;
     if (saved.chatMessages !== undefined) chatState.chatMessages = saved.chatMessages;
@@ -197,6 +200,9 @@ export const state = reactive({
   get fullscreen() { return uiState.fullscreen; },
   set fullscreen(v) { uiState.fullscreen = v; },
 
+  get modoGuiado() { return uiState.modoGuiado; },
+  set modoGuiado(v) { uiState.modoGuiado = v; },
+
   get clockTime() { return uiState.clockTime; },
   set clockTime(v) { uiState.clockTime = v; },
 
@@ -235,6 +241,7 @@ watch(
     activitiesState.currentActivity,
     activitiesState.currentActivityId,
     uiState.fullscreen,
+    uiState.modoGuiado,
     chatState.chatMessages,
     activacionState,
     softCloseState,
@@ -250,6 +257,7 @@ watch(
       currentUser: authState.currentUser,
       currentActivityId: activitiesState.currentActivity?.id || activitiesState.currentActivityId,
       fullscreen: uiState.fullscreen,
+      modoGuiado: uiState.modoGuiado,
       timerSeconds: chatState.timerSeconds,
       chatTimerStr: chatState.chatTimerStr,
       chatMessages: chatState.chatMessages,
@@ -353,6 +361,8 @@ export function useSimulator() {
     openColorimetria,
     closeColorimetria,
     toggleFullscreen,
+    setModoGuiado,
+    toggleModoGuiado,
     selectActivity,
     iniciarRutaIndividual,
     iniciarActividadPredio,

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="flow-hint-wrapper" :class="[computedPosition, { 'is-minimized': isMinimized }]">
+  <div v-if="visible && state.ui.modoGuiado" class="flow-hint-wrapper" :class="[computedPosition, { 'is-minimized': isMinimized }]">
     <!-- Versión Minimizada (Píldora compacta que no tapa nada) -->
     <div v-if="isMinimized" class="flow-hint-pill" @click="toggleMinimize" title="Expandir sugerencia">
       <span class="pill-bulb">💡</span>
@@ -59,6 +59,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useSimulator } from '../composables/useSimulator';
+
+const { state } = useSimulator();
 
 const props = defineProps({
   step: {

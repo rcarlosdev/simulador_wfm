@@ -7,6 +7,7 @@ import router from '../router';
 
 export const uiState = reactive({
   fullscreen: false,
+  modoGuiado: true, // true: Modo Guiado (con pistas y tutorial), false: Modo Libre (sin ayudas)
   clockTime: '07:15',
   drawerOpen: false,
   contextMenuOpen: false,
@@ -84,6 +85,20 @@ export function toggleFullscreen() {
       console.warn('Error al salir de pantalla completa:', err);
     });
   }
+}
+
+export function setModoGuiado(valor) {
+  uiState.modoGuiado = !!valor;
+  showToast(
+    uiState.modoGuiado
+      ? '🧭 Modo Guiado activado: Se muestran las pistas y pasos oficiales.'
+      : '🎯 Modo Libre activado: Simulación sin ayudas para práctica y evaluación.',
+    'info'
+  );
+}
+
+export function toggleModoGuiado() {
+  setModoGuiado(!uiState.modoGuiado);
 }
 
 // Mapa de nombres de pantallas legacy a rutas de vue-router

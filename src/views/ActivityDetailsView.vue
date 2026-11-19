@@ -11,7 +11,7 @@
         </button>
         <div
           class="chat-badge-container btn-open-chat"
-          :class="{ 'target-highlight': act.tipo !== 'almacen' && act.estado === 'comenzado' && currentPlanillaStep === 2 }"
+          :class="{ 'target-highlight': act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2 }"
           title="Colaboración / Mensajería"
           @click="irAColaboracion"
         >
@@ -55,7 +55,8 @@
           type="button"
           class="btn-dots-menu"
           :class="{
-            'target-highlight': (act.estado === 'comenzado' && currentMapaCalorStep === 1) || (act.estado === 'comenzado' && cierreState.currentStep === 2)
+            'target-highlight': (act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1) ||
+                                (act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3)
           }"
           title="Opciones (...)"
           @click.stop="handleToggleContextMenu"
@@ -297,7 +298,9 @@
           <template v-else-if="act.estado === 'comenzado'">
             <div
               class="context-menu-item"
-              :class="{ 'item-target-highlight': cierreState.currentStep === 3 }"
+              :class="{
+                'item-target-highlight': mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3
+              }"
               style="color:#d32f2f;font-weight:700;"
               @click="handleAction('completar')"
             >
@@ -309,7 +312,7 @@
             <div
               class="context-menu-item"
               :class="{
-                'item-target-highlight': act.estado === 'comenzado' && currentMapaCalorStep === 2
+                'item-target-highlight': act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2
               }"
               style="color:#81c784;font-weight:700;"
               @click="handleAction('cobertura_wifi')"
@@ -396,40 +399,43 @@
       En la OT del cliente, despliega el menú con los tres puntos de la parte superior derecha, y selecciona <strong>SoftClose</strong>.
     </FlowHintBox>
 
-    <!-- Paso 2 (PLANILLA DE NOTAS.pdf Pág 1) -->
+    <!-- ====================================================================
+         SECUENCIA OPERATIVA: MAPA DE CALOR -> PLANILLA DE NOTAS -> CIERRE OT
+         ==================================================================== -->
+    <!-- 1. Paso 1 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 1) -->
     <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && currentPlanillaStep === 2"
-      step="2"
-      title="Paso 2 - Plantilla de Notas"
-    >
-      Para acceder a la plantilla de notas, pulsa el <strong>botón de mensajería</strong> ubicado en la parte superior derecha.
-    </FlowHintBox>
-
-    <!-- Paso 3 (CIERRE OT y RUTA WFM.pdf Pág 1) -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && cierreState.currentStep === 3"
-      step="3"
-      title="Paso 3 - Completar OT"
-    >
-      En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
-    </FlowHintBox>
-
-    <!-- Paso 1 (MAPA DE CALOR app H&B.pdf Pág 1) -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && currentMapaCalorStep === 1 && !state.contextMenuOpen"
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1 && !state.contextMenuOpen"
       step="1"
       title="Paso 1 - Menú de Opciones"
     >
       En la pantalla <strong>Detalles de actividad</strong>, despliega el menú presionando los <strong>tres puntos</strong> ubicados en la parte superior derecha.
     </FlowHintBox>
 
-    <!-- Paso 2 (MAPA DE CALOR app H&B.pdf Pág 2) -->
+    <!-- 1. Paso 2 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 2) -->
     <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && currentMapaCalorStep === 2 && state.contextMenuOpen"
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2 && state.contextMenuOpen"
       step="2"
       title="Paso 2 - Cobertura Wifi"
     >
       En el menú desplegado, selecciona la opción <strong>Cobertura wifi</strong>.
+    </FlowHintBox>
+
+    <!-- 2. Paso 2 Planilla de Notas (PLANILLA DE NOTAS.pdf Pág 1) - Tras certificar Cobertura WiFi -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2"
+      step="2"
+      title="Paso 2 - Plantilla de Notas"
+    >
+      Para acceder a la plantilla de notas, pulsa el <strong>botón de mensajería</strong> ubicado en la parte superior derecha.
+    </FlowHintBox>
+
+    <!-- 3. Paso 3 Cierre de OT (CIERRE OT y RUTA WFM.pdf Pág 1) - Tras enviar Planilla de Notas -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3"
+      step="3"
+      title="Paso 3 - Completar OT"
+    >
+      En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
     </FlowHintBox>
   </div>
 </template>
