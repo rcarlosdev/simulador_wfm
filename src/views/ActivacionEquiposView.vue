@@ -254,8 +254,14 @@
             </label>
           </div>
 
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:0.75rem;color:#aaa;">Inventario:</span>
+            <button type="button" class="btn-inv-tab active">TECNICO</button>
+            <button type="button" class="btn-inv-tab">CLIENTE</button>
+          </div>
+
           <div style="font-size:0.68rem;color:#999;margin-bottom:4px;">
-            Inventario: <strong>TECNICO</strong> | Tip-Fab-Mod-Ser-Chip-Mac-Est
+            Tip-Fab-Mod-Ser-Chip-Mac-Est
           </div>
 
           <div class="ofsc-equipment-list">
@@ -268,6 +274,15 @@
             >
               {{ eq.label }}
             </div>
+          </div>
+
+          <div class="ofsc-table-pagination">
+            <span>({{ tvMostrarMasTec ? '9 of 11' : '1 of 8' }})</span>
+            <span class="pag-btn">|&lt;</span>
+            <span class="pag-btn">&lt;</span>
+            <span class="pag-btn">&gt;</span>
+            <span class="pag-btn">&gt;|</span>
+            <span class="pag-size">5 ▼</span>
           </div>
 
           <div class="ofsc-btn-row-bottom">
@@ -311,7 +326,7 @@
           </div>
         </div>
 
-        <!-- PASO 7 (TV): TARJETA VIRTUAL -->
+        <!-- PASO 7 (TV): TARJETA VIRTUAL CON MISMA FUNCIONALIDAD Y CANTIDAD -->
         <div class="ofsc-step-view" v-if="stepNumber === 7">
           <div class="ofsc-control-group">
             <label class="ofsc-label">Control Remoto:</label>
@@ -321,13 +336,27 @@
           <div class="ofsc-section-title-line">
             <span class="sec-title">Inventario Tarjetas Virtuales</span>
           </div>
+
+          <div class="ofsc-checkbox-line" style="margin-bottom:8px;">
+            <label class="ofsc-chk-lbl">
+              <input type="checkbox" v-model="tvTarjetasMostrarMasTec">
+              <span>Mostrar mas Tecnologias</span>
+            </label>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:0.75rem;color:#aaa;">Inventario:</span>
+            <button type="button" class="btn-inv-tab active">TECNICO</button>
+            <button type="button" class="btn-inv-tab">CLIENTE</button>
+          </div>
+
           <div style="font-size:0.68rem;color:#999;margin-bottom:4px;">
-            Selecciona la tarjeta virtual de tu inventario:
+            Tip-Fab-Mod-Ser-Chip-Mac-Est
           </div>
 
           <div class="ofsc-equipment-list">
             <div
-              v-for="t in tvTarjetasList"
+              v-for="t in tvTarjetasFiltradas"
               :key="t.serial"
               class="eq-item"
               :class="{ 'selected': selectedTvTarjetaSerial === t.serial }"
@@ -335,6 +364,15 @@
             >
               {{ t.label }}
             </div>
+          </div>
+
+          <div class="ofsc-table-pagination">
+            <span>({{ tvTarjetasMostrarMasTec ? '9 of 11' : '1 of 8' }})</span>
+            <span class="pag-btn">|&lt;</span>
+            <span class="pag-btn">&lt;</span>
+            <span class="pag-btn">&gt;</span>
+            <span class="pag-btn">&gt;|</span>
+            <span class="pag-size">5 ▼</span>
           </div>
 
           <div class="ofsc-btn-row-bottom">
@@ -664,17 +702,20 @@
       </div>
     </div>
 
-    <!-- CAJA DE PISTAS FLOTANTE (Solo Pistas orientativas del paso actual) -->
-    <div class="ofsc-pdf-instruction-card">
-      <div class="pdf-inst-header">💡 Pista - {{ currentStepTitle }}:</div>
-      <div class="pdf-inst-body" v-html="currentHintText"></div>
-    </div>
+    <!-- CAJA DE PISTAS FLOTANTE UNIFICADA -->
+    <FlowHintBox
+      :step="stepNumber"
+      :title="currentStepTitle"
+    >
+      <div v-html="currentHintText"></div>
+    </FlowHintBox>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useSimulator } from '../composables/useSimulator';
+import FlowHintBox from '../components/FlowHintBox.vue';
 
 const { state, showScreen, showToast, openDrawer } = useSimulator();
 
@@ -765,12 +806,19 @@ const selectedTvDecoSerial = computed({
 });
 
 const tvDecosList = [
+  // 8 Decodificadores Base (DVB / Tradicionales)
   { serial: '610120818136', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818136 - 022D2197 - TECH', extra: false },
   { serial: '00824416060029714', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029714 - 0727C35F - TECH', extra: false },
   { serial: '601391700073530', label: 'DBV_NEW - NEW - NL5101-E - 601391700073530 - 01D40D8F - TECH', extra: false },
-  { serial: '254419362225', label: 'ITV_N2P - N2P - NL-6105RC - 254419362225 - 3754F11631 - TECH', extra: true },
-  { serial: '254871673753', label: 'ITV_NIP - NIP - NL-6105RB - 254871673753 - 378EDC165F - TECH', extra: true },
-  { serial: '254871678602', label: 'ITV_NIP - NIP - NL-6105RB - 254871678602 - 376EDC2951 - TECH', extra: true }
+  { serial: '9670119050130360', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119050130360 - 0177FAA4 - TECH', extra: false },
+  { serial: '9670119010085296', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119010085296 - 016A5B85 - TECH', extra: false },
+  { serial: '601391700073612', label: 'DBV_NEW - NEW - NL5101-E - 601391700073612 - 01D40E10 - TECH', extra: false },
+  { serial: '610120818240', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818240 - 022D2205 - TECH', extra: false },
+  { serial: '00824416060029830', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029830 - 0727C410 - TECH', extra: false },
+  // 3 Decodificadores Adicionales (IPTV) con 'Mostrar más tecnologías' (Total 11)
+  { serial: '254419362225', label: 'ITV_N2P - N2P - NL 6105RC - 254419362225 - 3754F11631 - A8:F4:70:C1:6D:A5 - TECH', extra: true },
+  { serial: '254425484764', label: 'ITV_N2P - N2P - NL 6105RC - 254425484764 - 37555E55C5 - A8:F4:70:C2:84:89 - TECH', extra: true },
+  { serial: '254871678602', label: 'ITV_NIP - NIP - NL 6105RB - 254871678602 - 378EDC2951 - A8:F4:70:EC:E3:94 - TECH', extra: true }
 ];
 
 const tvDecosFiltrados = computed(() => {
@@ -783,11 +831,28 @@ const selectedTvControl = computed({
 });
 const tvControlDropdownOpen = ref(false);
 
-const tvTarjetasList = [
-  { serial: '25441936222V', label: 'CAR_NGR - NGR - NGR - 25441936222V - TECH' },
-  { serial: '25487167860V', label: 'CAR_NGR - NGR - NGR - 25487167860V - TECH' },
-  { serial: '25487167870V', label: 'CAR_NGR - NGR - NGR - 25487167870V - TECH' }
-];
+const tvTarjetasMostrarMasTec = computed({
+  get: () => prog.tvTarjetasMostrarMasTec ?? prog.tvMostrarMasTec ?? false,
+  set: (v) => { prog.tvTarjetasMostrarMasTec = v; }
+});
+
+// Tarjetas Virtuales: coinciden exactamente 1 a 1 con los Decos cambiando el último dígito por 'V'
+const tvTarjetasList = computed(() => {
+  return tvDecosList.map(deco => {
+    const cardSerial = deco.serial.slice(0, -1) + 'V';
+    return {
+      serial: cardSerial,
+      label: `CAR_NGR - NGR - NGR - ${cardSerial} - - - TECH`,
+      extra: deco.extra,
+      decoSerial: deco.serial
+    };
+  });
+});
+
+const tvTarjetasFiltradas = computed(() => {
+  return tvTarjetasMostrarMasTec.value ? tvTarjetasList.value : tvTarjetasList.value.filter(t => !t.extra);
+});
+
 const selectedTvTarjetaSerial = computed({
   get: () => prog.selectedTvTarjetaSerial,
   set: (v) => { prog.selectedTvTarjetaSerial = v; }
@@ -1026,7 +1091,7 @@ const currentHintText = computed(() => {
       return 'Despliega el selector y asocia el control remoto del decodificador (ej. <strong>Universal DVB, ATSC y DTH</strong>).';
     }
     if (stepNumber.value === 7) {
-      return 'Elige la tarjeta virtual a asociar para vincular el aprovisionamiento de TV.';
+      return 'En <strong>Inventario Tarjetas</strong>, activa <strong>Mostrar más Tecnologías</strong> para expandir las tarjetas y selecciona la tarjeta virtual (ej. <strong>25487167860V</strong>).';
     }
     if (stepNumber.value === 8) {
       return 'Revisa el resumen de servicios asociados y presiona <strong>Activar Servicios</strong> para enviar la confirmación.';
@@ -1065,3 +1130,60 @@ const currentHintText = computed(() => {
   return 'Sigue las opciones en pantalla para avanzar en el aprovisionamiento técnico.';
 });
 </script>
+
+<style scoped>
+.btn-inv-tab {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #ccc;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-inv-tab.active {
+  background: #1976d2;
+  border-color: #1565c0;
+  color: #ffffff;
+}
+
+.ofsc-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 6px;
+  padding: 4px 6px;
+}
+
+.pag-btn {
+  background: #262626;
+  border: 1px solid #3d3d3d;
+  color: #bbb;
+  padding: 2px 6px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.68rem;
+  user-select: none;
+}
+
+.pag-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.pag-size {
+  border: 1px solid #3d3d3d;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: #1f1f1f;
+  color: #bbb;
+  font-size: 0.68rem;
+}
+</style>
