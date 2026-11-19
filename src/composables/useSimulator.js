@@ -107,6 +107,11 @@ import {
   enviarMensajePrivado
 } from '../flows/planilla_notas/usePlanillaNotasFlow.js';
 
+import {
+  mapaCalorState,
+  useMapaCalorFlow
+} from '../flows/mapa_calor/useMapaCalorFlow.js';
+
 // Restaurar datos guardados
 function initializeState() {
   const saved = loadStoredData();
@@ -139,6 +144,9 @@ function initializeState() {
     }
     if (saved.planillaNotasProgress !== undefined) {
       Object.assign(planillaNotasState, saved.planillaNotasProgress);
+    }
+    if (saved.mapaCalorProgress !== undefined) {
+      Object.assign(mapaCalorState, saved.mapaCalorProgress);
     }
     if (saved.softCloseProgress !== undefined) {
       Object.assign(softCloseState, saved.softCloseProgress);
@@ -174,6 +182,7 @@ export const state = reactive({
   desplazamiento: desplazamientoState,
   cierre: cierreState,
   planillaNotas: planillaNotasState,
+  mapaCalor: mapaCalorState,
 
   // Getters / Setters de compatibilidad con componentes existentes
   get currentUser() { return authState.currentUser; },
@@ -215,7 +224,8 @@ export const state = reactive({
   get almacenProgress() { return almacenState; },
   get desplazamientoProgress() { return desplazamientoState; },
   get cierreProgress() { return cierreState; },
-  get planillaNotasProgress() { return planillaNotasState; }
+  get planillaNotasProgress() { return planillaNotasState; },
+  get mapaCalorProgress() { return mapaCalorState; }
 });
 
 // Guardado reactivo en segundo plano ante cualquier cambio
@@ -232,7 +242,8 @@ watch(
     almacenState,
     desplazamientoState,
     cierreState,
-    planillaNotasState
+    planillaNotasState,
+    mapaCalorState
   ],
   () => {
     saveStoredData(() => ({
@@ -248,7 +259,8 @@ watch(
       almacenProgress: almacenState,
       desplazamientoProgress: desplazamientoState,
       cierreProgress: cierreState,
-      planillaNotasProgress: planillaNotasState
+      planillaNotasProgress: planillaNotasState,
+      mapaCalorProgress: mapaCalorState
     }));
   },
   { deep: true }
@@ -386,6 +398,9 @@ export function useSimulator() {
     abrirChatDeltaGeneral,
     abrirInfoUsuario,
     iniciarConversacionPrivada,
-    enviarMensajePrivado
+    enviarMensajePrivado,
+    // Métodos de Mapa de Calor (App H&B)
+    mapaCalorState,
+    ...useMapaCalorFlow()
   };
 }

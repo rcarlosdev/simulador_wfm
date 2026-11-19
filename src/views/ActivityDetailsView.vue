@@ -51,7 +51,15 @@
           <span class="timer-badge-val">En ejecución: {{ formatDuration(act.actElapsedSec || 0) }}</span>
         </div>
 
-        <button type="button" class="btn-dots-menu" title="Opciones (...)" @click.stop="toggleContextMenu">
+        <button
+          type="button"
+          class="btn-dots-menu"
+          :class="{
+            'target-highlight': (act.estado === 'comenzado' && currentMapaCalorStep === 1) || (act.estado === 'comenzado' && cierreState.currentStep === 2)
+          }"
+          title="Opciones (...)"
+          @click.stop="handleToggleContextMenu"
+        >
           <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
         </button>
       </div>
@@ -298,7 +306,16 @@
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
             <div class="context-menu-item" style="color:#4fc3f7;font-weight:700;" @click="handleAction('activacion_auto')">Activacion Servicios</div>
             <div class="context-menu-item" @click="handleAction('ajustar_tiempo')">Ajustar tiempo</div>
-            <div class="context-menu-item" style="color:#81c784;font-weight:700;" @click="handleAction('cobertura_wifi')">Cobertura Wifi</div>
+            <div
+              class="context-menu-item"
+              :class="{
+                'item-target-highlight': act.estado === 'comenzado' && currentMapaCalorStep === 2
+              }"
+              style="color:#81c784;font-weight:700;"
+              @click="handleAction('cobertura_wifi')"
+            >
+              Cobertura Wifi
+            </div>
             <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
             <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
             <div class="context-menu-item" @click="handleAction('mapa')">Mapa</div>
@@ -396,6 +413,24 @@
     >
       En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
     </FlowHintBox>
+
+    <!-- Paso 1 (MAPA DE CALOR app H&B.pdf Pág 1) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && currentMapaCalorStep === 1 && !state.contextMenuOpen"
+      step="1"
+      title="Paso 1 - Menú de Opciones"
+    >
+      En la pantalla <strong>Detalles de actividad</strong>, despliega el menú presionando los <strong>tres puntos</strong> ubicados en la parte superior derecha.
+    </FlowHintBox>
+
+    <!-- Paso 2 (MAPA DE CALOR app H&B.pdf Pág 2) -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && currentMapaCalorStep === 2 && state.contextMenuOpen"
+      step="2"
+      title="Paso 2 - Cobertura Wifi"
+    >
+      En el menú desplegado, selecciona la opción <strong>Cobertura wifi</strong>.
+    </FlowHintBox>
   </div>
 </template>
 
@@ -405,6 +440,7 @@ import { useRoute } from 'vue-router';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
 import { useCierreFlow } from '../flows/cierre/useCierreFlow';
 import { usePlanillaNotasFlow } from '../flows/planilla_notas/usePlanillaNotasFlow';
+import { useMapaCalorFlow } from '../flows/mapa_calor/useMapaCalorFlow';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const route = useRoute();
@@ -427,8 +463,17 @@ const {
 
 const { cierreState, advanceCierreStep } = useCierreFlow();
 const { planillaNotasState, advancePlanillaStep, abrirListaColaboracion } = usePlanillaNotasFlow();
+const { mapaCalorState, abrirMenuDetalles, abrirCoberturaWifi } = useMapaCalorFlow();
 
 const currentPlanillaStep = computed(() => planillaNotasState.currentStep);
+const currentMapaCalorStep = computed(() => mapaCalorState.currentStep);
+
+const handleToggleContextMenu = () => {
+  if (currentMapaCalorStep.value === 1 && act.value?.estado === 'comenzado') {
+    abrirMenuDetalles();
+  }
+  toggleContextMenu();
+};
 
 const irAColaboracion = () => {
   abrirListaColaboracion();
@@ -539,6 +584,7 @@ const handleAction = (actionKey) => {
       break;
 
     case 'cobertura_wifi':
+      abrirCoberturaWifi();
       showScreen('/cobertura-wifi');
       break;
 

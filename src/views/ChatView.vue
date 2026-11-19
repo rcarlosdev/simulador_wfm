@@ -2,36 +2,42 @@
   <div class="simulator-screen screen-colaboracion screen-active" id="screen-colaboracion">
 
     <!-- ====================================================================
-         CABECERA GENERAL OFSC DE COLABORACIÓN (Barra Blanca con Iconos)
+         CABECERA GENERAL OFSC DE COLABORACIÓN (Barra Oscura con Iconos)
          ==================================================================== -->
     <div class="colab-top-bar">
       <div class="colab-top-left">
         <span class="colab-main-title">Colaboración</span>
       </div>
       <div class="colab-top-right">
-        <!-- Botón Mensajes / Iniciar Nueva Conversación (Páginas 2, 4, 5 del PDF) -->
+        <!-- En vista de lista: Botón 'Nueva conversación' con IconMessagePlus y texto (Imagen 2) -->
         <button
+          v-if="planillaNotasState.subView === 'lista'"
           type="button"
           class="btn-nuevo-mensaje-header"
-          :class="{
-            'btn-tutorial-highlight': planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'
-          }"
           title="Iniciar nueva conversación"
           aria-label="Iniciar nueva conversación"
           @click="handleBotonMensajes"
         >
-          <!-- SVG Lineal Idéntico al PDF: Bocadillo rectangular con líneas internas y signo (+) -->
-          <svg viewBox="0 0 24 24" class="svg-chat-plus" fill="none" stroke="currentColor">
-            <path d="M4 4h13a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5.5l-3.5 3.5V13H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="6" y1="7.5" x2="13.5" y2="7.5" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="6" y1="10" x2="12" y2="10" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="19.5" y1="15" x2="19.5" y2="21" stroke-width="2.2" stroke-linecap="round"/>
-            <line x1="16.5" y1="18" x2="22.5" y2="18" stroke-width="2.2" stroke-linecap="round"/>
-          </svg>
+          <IconMessagePlus :size="20" :stroke="1.8" class="svg-chat-plus" />
           <span class="btn-nuevo-label">Nueva conversación</span>
         </button>
 
-        <!-- Botón Cerrar (✕) para regresar a los detalles de la orden -->
+        <!-- En vistas de conversación: Botón de mensajes sin texto (IconMessageDots) (Imágenes 1 y 4) -->
+        <button
+          v-else
+          type="button"
+          class="btn-icon-mensaje-header"
+          :class="{
+            'btn-tutorial-highlight': planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'
+          }"
+          title="Mensajería"
+          aria-label="Mensajería"
+          @click="handleBotonMensajes"
+        >
+          <IconMessageDots :size="20" :stroke="1.8" class="svg-chat-dots" />
+        </button>
+
+        <!-- Botón Cerrar (✕) con Tabler Icon: IconX -->
         <button
           type="button"
           class="btn-colab-close"
@@ -39,16 +45,13 @@
           aria-label="Cerrar Colaboración"
           @click="cerrarColaboracion"
         >
-          <svg viewBox="0 0 24 24" class="svg-close-icon">
-            <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <line x1="6" y1="18" x2="18" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+          <IconX :size="20" :stroke="2" class="svg-close-icon" />
         </button>
       </div>
     </div>
 
     <!-- ====================================================================
-         VISTA 1: LISTADO DE CHATS DE COLABORACIÓN (Páginas 2 y 3)
+         VISTA 1: LISTADO DE CHATS DE COLABORACIÓN (Páginas 2 y 3 - Dark Theme)
          ==================================================================== -->
     <div v-if="planillaNotasState.subView === 'lista'" class="colab-subview-wrapper">
       <div class="colab-list-body screen-scroll-body">
@@ -59,12 +62,7 @@
           @click="seleccionarChatDelta"
         >
           <div class="chat-item-avatar-line">
-            <svg viewBox="0 0 24 24" class="svg-group-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M14.5 6a3 3 0 0 1 0 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M15.5 14.5a5.5 5.5 0 0 1 5 3.5v0.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+            <IconUsers :size="26" :stroke="1.8" class="svg-group-line" />
           </div>
           <div class="chat-item-content">
             <div class="chat-item-header">
@@ -82,12 +80,7 @@
         <!-- Item 2: Conferencia -->
         <div class="colab-chat-item" @click="showToast('Selecciona el chat Delta aliado')">
           <div class="chat-item-avatar-line">
-            <svg viewBox="0 0 24 24" class="svg-group-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M14.5 6a3 3 0 0 1 0 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M15.5 14.5a5.5 5.5 0 0 1 5 3.5v0.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+            <IconUsers :size="26" :stroke="1.8" class="svg-group-line" />
           </div>
           <div class="chat-item-content">
             <div class="chat-item-header">
@@ -105,12 +98,7 @@
         <!-- Item 3: ALIADO EZENTIS DELTA -->
         <div class="colab-chat-item" @click="showToast('Selecciona el chat Delta aliado')">
           <div class="chat-item-avatar-line">
-            <svg viewBox="0 0 24 24" class="svg-group-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M14.5 6a3 3 0 0 1 0 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M15.5 14.5a5.5 5.5 0 0 1 5 3.5v0.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+            <IconUsers :size="26" :stroke="1.8" class="svg-group-line" />
           </div>
           <div class="chat-item-content">
             <div class="chat-item-header">
@@ -145,12 +133,7 @@
         <!-- Item 5: Conferencia -->
         <div class="colab-chat-item">
           <div class="chat-item-avatar-line">
-            <svg viewBox="0 0 24 24" class="svg-group-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M14.5 6a3 3 0 0 1 0 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M15.5 14.5a5.5 5.5 0 0 1 5 3.5v0.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+            <IconUsers :size="26" :stroke="1.8" class="svg-group-line" />
           </div>
           <div class="chat-item-content">
             <div class="chat-item-header">
@@ -162,27 +145,28 @@
         </div>
       </div>
 
-      <!-- Barra Inferior de Pestañas (Chats / Historia / Notificaciones) -->
+      <!-- Barra Inferior de Pestañas (Chats / Historia / Notificaciones con Tabler Icons) -->
       <div class="colab-tab-bar">
         <div
-          class="colab-tab-item active"
+          class="colab-tab-item"
+          :class="{ active: planillaNotasState.activeTab === 'chats' }"
           @click="planillaNotasState.activeTab = 'chats'"
         >
           <div style="position:relative;display:inline-block;">
-            <svg viewBox="0 0 24 24" class="svg-tab-icon"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+            <IconMessages :size="22" :stroke="1.8" class="svg-tab-icon" />
             <span class="tab-badge">3</span>
           </div>
           <span>Chats</span>
         </div>
 
         <div class="colab-tab-item" @click="showToast('Historial de chats')">
-          <svg viewBox="0 0 24 24" class="svg-tab-icon"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          <IconHistory :size="22" :stroke="1.8" class="svg-tab-icon" />
           <span>Historia</span>
         </div>
 
         <div class="colab-tab-item" @click="showToast('Notificaciones')">
           <div style="position:relative;display:inline-block;">
-            <svg viewBox="0 0 24 24" class="svg-tab-icon"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+            <IconBell :size="22" :stroke="1.8" class="svg-tab-icon" />
             <span class="tab-badge">3</span>
           </div>
           <span>Notificaciones</span>
@@ -191,25 +175,18 @@
     </div>
 
     <!-- ====================================================================
-         VISTA 2: CHAT GENERAL DELTA ALIADO EZENTIS (Páginas 4 y 5)
+         VISTA 2: CHAT GENERAL DELTA ALIADO EZENTIS (Páginas 4 y 5 - Dark Theme)
          ==================================================================== -->
     <div v-else-if="planillaNotasState.subView === 'chat_delta_general'" class="colab-subview-wrapper">
-      <!-- Subheader del Chat (Idéntico a la Pág. 4 y 5 del PDF) -->
+      <!-- Subheader del Chat (Dark Theme con Tabler Icons) -->
       <div class="chat-view-header">
         <button type="button" class="btn-chat-back" @click="planillaNotasState.subView = 'lista'" title="Volver">
-          <svg viewBox="0 0 24 24" class="svg-back-chevron">
-            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <IconChevronLeft :size="22" :stroke="2.2" class="svg-back-chevron" />
         </button>
 
-        <!-- Ícono lineal de grupo (dos siluetas finas, sin fondo tosco) -->
+        <!-- Ícono lineal de grupo (Tabler Icon: IconUsers) -->
         <div class="chat-header-avatar-line">
-          <svg viewBox="0 0 24 24" class="svg-group-line">
-            <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M14.5 6a3 3 0 0 1 0 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M15.5 14.5a5.5 5.5 0 0 1 5 3.5v0.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
+          <IconUsers :size="24" :stroke="1.8" class="svg-group-line" />
         </div>
 
         <div class="chat-header-info">
@@ -217,21 +194,13 @@
         </div>
 
         <div class="chat-header-actions">
-          <!-- Ícono lineal persona con signo + (invitar) idéntico al PDF -->
+          <!-- Ícono lineal persona con signo + (Tabler Icon: IconUserPlus) -->
           <button type="button" class="btn-head-act" title="Invitar persona" @click="showToast('Invitar participante')">
-            <svg viewBox="0 0 24 24" class="svg-user-add-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <line x1="18.5" y1="8" x2="18.5" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <line x1="15.5" y1="11" x2="21.5" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <IconUserPlus :size="22" :stroke="1.8" class="svg-user-add-line" />
           </button>
+          <!-- Ícono opciones 3 puntos (Tabler Icon: IconDotsVertical) -->
           <button type="button" class="btn-head-act" title="Opciones" @click="showToast('Opciones del chat')">
-            <svg viewBox="0 0 24 24" class="svg-dots-vertical">
-              <circle cx="12" cy="5" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="19" r="1.6" fill="currentColor"/>
-            </svg>
+            <IconDotsVertical :size="20" :stroke="1.8" class="svg-dots-vertical" />
           </button>
         </div>
       </div>
@@ -253,7 +222,7 @@
         </div>
       </div>
 
-      <!-- Barra Inferior de Entrada (Página 4) -->
+      <!-- Barra Inferior de Entrada (Página 4 - Dark Theme) -->
       <div class="chat-bottom-input-bar">
         <input
           type="text"
@@ -262,28 +231,24 @@
           disabled
         />
         <button type="button" class="btn-attach-clip" title="Adjuntar">
-          <svg viewBox="0 0 24 24" class="svg-clip-icon">
-            <path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <IconPaperclip :size="20" :stroke="1.8" class="svg-clip-icon" />
         </button>
       </div>
     </div>
 
     <!-- ====================================================================
-         VISTA 3: INFORMACIÓN DE USUARIO DELTA (Página 6)
+         VISTA 3: INFORMACIÓN DE USUARIO DELTA (Página 6 - Dark Theme)
          ==================================================================== -->
     <div v-else-if="planillaNotasState.subView === 'info_usuario'" class="colab-subview-wrapper">
       <div class="chat-view-header">
         <button type="button" class="btn-chat-back" @click="planillaNotasState.subView = 'chat_delta_general'" title="Volver">
-          <svg viewBox="0 0 24 24" class="svg-back-chevron">
-            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <IconChevronLeft :size="22" :stroke="2.2" class="svg-back-chevron" />
         </button>
         <div class="chat-header-name" style="font-size:0.95rem;">Información de usuario</div>
       </div>
 
       <div class="user-info-body screen-scroll-body">
-        <!-- Tarjeta de Perfil de la Delta (Idéntica a la Pág. 6 del PDF) -->
+        <!-- Tarjeta de Perfil de la Delta -->
         <div class="user-profile-header-card">
           <div class="user-squircle-avatar">
             <span>{{ planillaNotasState.deltaUser.initials }}</span>
@@ -294,7 +259,7 @@
           </div>
         </div>
 
-        <!-- Botón Nueva Conversación (Paso 5 - Recuadro Rosado Tutorial Oficial) -->
+        <!-- Botón Nueva Conversación (Paso 5 - Tabler Icon: IconMessage) -->
         <div class="btn-nueva-conv-container">
           <button
             type="button"
@@ -304,17 +269,12 @@
             }"
             @click="irAChatPrivado"
           >
-            <!-- Bocadillo de conversación lineal -->
-            <svg viewBox="0 0 24 24" class="svg-chat-line">
-              <path d="M4 4h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6l-4 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <line x1="6" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <line x1="6" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
+            <IconMessage :size="22" :stroke="1.8" class="svg-chat-line" />
             <span class="conv-btn-text">Nueva conversación</span>
           </button>
         </div>
 
-        <!-- Pestañas y Opciones inferiores (Página 6) -->
+        <!-- Pestañas y Opciones inferiores (Página 6 - Dark Theme) -->
         <div class="user-info-options">
           <div class="option-item-row" @click="showToast('Historial con el usuario')">
             <span class="option-title-blue">Historia</span>
@@ -327,15 +287,13 @@
     </div>
 
     <!-- ====================================================================
-         VISTA 4: CHAT PRIVADO CON LA DELTA ALISSON (Página 7)
+         VISTA 4: CHAT PRIVADO CON LA DELTA ALISSON (Página 7 - Dark Theme)
          ==================================================================== -->
     <div v-else-if="planillaNotasState.subView === 'chat_delta_privado'" class="colab-subview-wrapper">
-      <!-- Subheader del Chat Privado (Idéntico a la Pág. 7 del PDF) -->
+      <!-- Subheader del Chat Privado (Dark Theme con Tabler Icons) -->
       <div class="chat-view-header">
         <button type="button" class="btn-chat-back" @click="planillaNotasState.subView = 'info_usuario'" title="Volver">
-          <svg viewBox="0 0 24 24" class="svg-back-chevron">
-            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <IconChevronLeft :size="22" :stroke="2.2" class="svg-back-chevron" />
         </button>
         <div class="user-squircle-small">
           <span>{{ planillaNotasState.deltaUser.initials }}</span>
@@ -346,32 +304,23 @@
         </div>
         <div class="chat-header-actions">
           <button type="button" class="btn-head-act" title="Invitar persona" @click="showToast('Invitar participante')">
-            <svg viewBox="0 0 24 24" class="svg-user-add-line">
-              <circle cx="8.5" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 18.5v-0.8a5.5 5.5 0 0 1 11 0v0.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <line x1="18.5" y1="8" x2="18.5" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <line x1="15.5" y1="11" x2="21.5" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            <IconUserPlus :size="22" :stroke="1.8" class="svg-user-add-line" />
           </button>
           <button type="button" class="btn-head-act" title="Opciones" @click="showToast('Opciones del chat')">
-            <svg viewBox="0 0 24 24" class="svg-dots-vertical">
-              <circle cx="12" cy="5" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="12" r="1.6" fill="currentColor"/>
-              <circle cx="12" cy="19" r="1.6" fill="currentColor"/>
-            </svg>
+            <IconDotsVertical :size="20" :stroke="1.8" class="svg-dots-vertical" />
           </button>
         </div>
       </div>
 
-      <!-- Área de Mensajes Privados con la Planilla (Paso 6 - Pág. 7 del PDF) -->
+      <!-- Área de Mensajes Privados con la Planilla (Paso 6 - Dark Theme) -->
       <div class="chat-messages-scroll screen-scroll-body" ref="privadoBoxRef">
-        <!-- Burbujas Rosadas Oficiales (Página 7 del PDF) -->
+        <!-- Burbujas Oscuras con Borde Suave Oficial -->
         <div
           v-for="msg in planillaNotasState.mensajesPrivados"
           :key="msg.id"
           class="chat-bubble-privado"
         >
-          <pre class="msg-plantilla-text" style="color:#212121;">{{ msg.text }}</pre>
+          <pre class="msg-plantilla-text">{{ msg.text }}</pre>
           <div class="msg-time-status">
             <span>{{ msg.time }}</span>
             <span class="envelope-icon">✉</span>
@@ -379,7 +328,7 @@
         </div>
       </div>
 
-      <!-- Barra de Entrada Interactiva con Botón Enviar -->
+      <!-- Barra de Entrada Interactiva con Botón Enviar (Dark Theme) -->
       <div class="chat-bottom-input-bar">
         <input
           type="text"
@@ -394,12 +343,10 @@
           title="Enviar Mensaje"
           @click="handleEnviarMensaje"
         >
-          ➤
+          <IconSend :size="16" :stroke="2" />
         </button>
         <button type="button" class="btn-attach-clip" title="Adjuntar">
-          <svg viewBox="0 0 24 24" class="svg-clip-icon">
-            <path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <IconPaperclip :size="20" :stroke="1.8" class="svg-clip-icon" />
         </button>
       </div>
     </div>
@@ -451,6 +398,23 @@ import { ref, nextTick } from 'vue';
 import { useSimulator } from '../composables/useSimulator';
 import { usePlanillaNotasFlow } from '../flows/planilla_notas/usePlanillaNotasFlow';
 import FlowHintBox from '../components/FlowHintBox.vue';
+
+// Tabler Icons oficiales (@tabler/icons-vue)
+import {
+  IconMessagePlus,
+  IconMessageDots,
+  IconX,
+  IconUsers,
+  IconChevronLeft,
+  IconUserPlus,
+  IconDotsVertical,
+  IconPaperclip,
+  IconMessage,
+  IconMessages,
+  IconHistory,
+  IconBell,
+  IconSend
+} from '@tabler/icons-vue';
 
 const { showScreen, showToast } = useSimulator();
 const {
@@ -507,26 +471,28 @@ const handleEnviarMensaje = () => {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: #f4f6f8;
+  background: var(--ofs-bg-darker, #141414);
+  color: var(--ofs-text-white, #ffffff);
 }
 
 /* ====================================================================
-   CABECERA SUPERIOR BLANCA (Colaboración)
+   CABECERA SUPERIOR OSCURA (Colaboración)
    ==================================================================== */
 .colab-top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #202020;
+  border-bottom: 1px solid #333333;
   min-height: 48px;
 }
 
 .colab-main-title {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #ffffff;
+  letter-spacing: -0.2px;
 }
 
 .colab-top-right {
@@ -535,7 +501,7 @@ const handleEnviarMensaje = () => {
   gap: 8px;
 }
 
-/* Botón Nuevo Mensaje en la Cabecera (Páginas 4 y 5 del PDF) */
+/* Botón Nuevo Mensaje en la Cabecera (Páginas 4 y 5 del PDF - Dark Theme) */
 .btn-nuevo-mensaje-header {
   display: flex;
   align-items: center;
@@ -545,57 +511,81 @@ const handleEnviarMensaje = () => {
   border-radius: 6px;
   padding: 4px 8px;
   cursor: pointer;
-  color: #212121;
+  color: #e0e0e0;
   transition: all 0.2s ease;
 }
 
 .btn-nuevo-mensaje-header:hover {
-  background: #f5f5f5;
+  background: #2a2a2a;
+  color: #ffffff;
 }
 
 .btn-nuevo-label {
   font-size: 0.74rem;
   font-weight: 600;
-  color: #212121;
+  color: #e0e0e0;
   white-space: nowrap;
 }
 
-/* Resaltado del Tutorial Oficial (Página 5 del PDF) */
+/* Botón Icono Mensaje en la Cabecera dentro de un Chat (Imágenes 1 y 4 - Dark Theme) */
+.btn-icon-mensaje-header {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  color: #b0b0b0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-icon-mensaje-header:hover {
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+.svg-chat-dots {
+  color: currentColor;
+  flex-shrink: 0;
+}
+
+/* Resaltado del Tutorial Oficial (Página 5 del PDF - Dark Theme) */
 .btn-tutorial-highlight {
-  background: #fce4ec !important;
-  border: 1.5px solid #e57373 !important;
+  background: rgba(229, 57, 53, 0.25) !important;
+  border: 1.5px solid #ef5350 !important;
   border-radius: 8px !important;
   animation: pulseTutorial 1.6s infinite ease-in-out;
 }
 
 .btn-tutorial-highlight .btn-nuevo-label {
-  color: #c62828 !important;
+  color: #ff8a80 !important;
   font-weight: 700;
 }
 
-.btn-tutorial-highlight .svg-chat-plus {
-  color: #c62828 !important;
+.btn-tutorial-highlight .svg-chat-plus,
+.btn-tutorial-highlight .svg-chat-dots {
+  color: #ff8a80 !important;
 }
 
 @keyframes pulseTutorial {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(229, 115, 115, 0.4);
+    box-shadow: 0 0 0 0 rgba(239, 83, 80, 0.45);
   }
   50% {
     transform: scale(1.03);
-    box-shadow: 0 0 0 6px rgba(229, 115, 115, 0);
+    box-shadow: 0 0 0 6px rgba(239, 83, 80, 0);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(229, 115, 115, 0);
+    box-shadow: 0 0 0 0 rgba(239, 83, 80, 0);
   }
 }
 
 .svg-chat-plus {
-  width: 20px;
-  height: 20px;
-  color: #212121;
+  color: currentColor;
   flex-shrink: 0;
 }
 
@@ -603,29 +593,33 @@ const handleEnviarMensaje = () => {
 .btn-colab-close {
   background: none;
   border: none;
-  color: #212121;
+  color: #b0b0b0;
   cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.btn-colab-close:hover {
+  color: #ffffff;
 }
 
 .svg-close-icon {
-  width: 18px;
-  height: 18px;
-  stroke: #212121;
+  color: currentColor;
 }
 
 /* ====================================================================
-   VISTA 1: LISTA DE CHATS
+   VISTA 1: LISTA DE CHATS (Dark Theme)
    ==================================================================== */
 .colab-subview-wrapper {
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+  background: #181818;
 }
 
 .colab-list-body {
@@ -638,14 +632,14 @@ const handleEnviarMensaje = () => {
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  background: #ffffff;
-  border-bottom: 1px solid #eeeeee;
+  background: #222222;
+  border-bottom: 1px solid #2d2d2d;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .colab-chat-item:hover {
-  background: #f9f9f9;
+  background: #2b2b2b;
 }
 
 .chat-item-avatar-line {
@@ -656,13 +650,13 @@ const handleEnviarMensaje = () => {
   justify-content: center;
   margin-right: 12px;
   flex-shrink: 0;
-  color: #37474f;
+  color: #cfd8dc;
 }
 
 .chat-user-squircle {
   width: 36px;
   height: 36px;
-  background: #607d8b;
+  background: #455a64;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -686,7 +680,7 @@ const handleEnviarMensaje = () => {
   height: 8px;
   border-radius: 50%;
   background: #4caf50;
-  border: 1.5px solid #ffffff;
+  border: 1.5px solid #222222;
 }
 
 .chat-item-content {
@@ -704,7 +698,7 @@ const handleEnviarMensaje = () => {
 .chat-item-name {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #212121;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -712,13 +706,13 @@ const handleEnviarMensaje = () => {
 
 .chat-item-time {
   font-size: 0.68rem;
-  color: #d32f2f;
+  color: #ef5350;
   margin-left: 6px;
 }
 
 .chat-item-sub {
   font-size: 0.72rem;
-  color: #757575;
+  color: #9e9e9e;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -729,12 +723,12 @@ const handleEnviarMensaje = () => {
   justify-content: space-between;
   align-items: center;
   font-size: 0.72rem;
-  color: #9e9e9e;
+  color: #757575;
   margin-top: 2px;
 }
 
 .chat-unread-badge {
-  background: #d32f2f;
+  background: #c61d15;
   color: #ffffff;
   font-size: 0.66rem;
   font-weight: 700;
@@ -742,12 +736,12 @@ const handleEnviarMensaje = () => {
   padding: 1px 6px;
 }
 
-/* Barra Inferior de Pestañas (Chats / Historia / Notificaciones) */
+/* Barra Inferior de Pestañas (Chats / Historia / Notificaciones - Dark Theme) */
 .colab-tab-bar {
   display: flex;
   justify-content: space-around;
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  background: #202020;
+  border-top: 1px solid #333333;
   padding: 6px 0;
 }
 
@@ -756,31 +750,30 @@ const handleEnviarMensaje = () => {
   flex-direction: column;
   align-items: center;
   font-size: 0.68rem;
-  color: #757575;
+  color: #888888;
   cursor: pointer;
   padding: 4px 14px;
+  transition: color 0.15s ease;
 }
 
 .svg-tab-icon {
-  width: 22px;
-  height: 22px;
-  fill: #757575;
+  color: currentColor;
+}
+
+.colab-tab-item:hover {
+  color: #cfd8dc;
 }
 
 .colab-tab-item.active {
-  color: #d32f2f;
+  color: #ef5350;
   font-weight: 700;
-}
-
-.colab-tab-item.active .svg-tab-icon {
-  fill: #d32f2f;
 }
 
 .tab-badge {
   position: absolute;
   top: -4px;
   right: -8px;
-  background: #d32f2f;
+  background: #c61d15;
   color: #ffffff;
   font-size: 0.6rem;
   font-weight: 700;
@@ -789,32 +782,35 @@ const handleEnviarMensaje = () => {
 }
 
 /* ====================================================================
-   SUBHEADER DEL CHAT (Páginas 4, 5, 7)
+   SUBHEADER DEL CHAT (Páginas 4, 5, 7 - Dark Theme)
    ==================================================================== */
 .chat-view-header {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #202020;
+  border-bottom: 1px solid #333333;
   min-height: 44px;
 }
 
 .btn-chat-back {
   background: none;
   border: none;
-  color: #424242;
+  color: #b0b0b0;
   cursor: pointer;
   padding: 2px 8px 2px 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-chat-back:hover {
+  color: #ffffff;
 }
 
 .svg-back-chevron {
-  width: 20px;
-  height: 20px;
-  stroke: #424242;
+  color: currentColor;
 }
 
 .chat-header-avatar-line {
@@ -822,13 +818,11 @@ const handleEnviarMensaje = () => {
   align-items: center;
   justify-content: center;
   margin-right: 8px;
-  color: #212121;
+  color: #cfd8dc;
 }
 
 .svg-group-line {
-  width: 24px;
-  height: 24px;
-  color: #212121;
+  color: currentColor;
 }
 
 .chat-header-info {
@@ -839,7 +833,7 @@ const handleEnviarMensaje = () => {
 .chat-header-name {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #212121;
+  color: #ffffff;
 }
 
 .chat-header-actions {
@@ -851,39 +845,40 @@ const handleEnviarMensaje = () => {
 .btn-head-act {
   background: none;
   border: none;
-  color: #212121;
+  color: #b0b0b0;
   cursor: pointer;
   padding: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-head-act:hover {
+  color: #ffffff;
 }
 
 .svg-user-add-line {
-  width: 22px;
-  height: 22px;
-  color: #212121;
+  color: currentColor;
 }
 
 .svg-dots-vertical {
-  width: 20px;
-  height: 20px;
-  color: #212121;
+  color: currentColor;
 }
 
-/* Fila de Participantes (Con: ... Mostrar) */
+/* Fila de Participantes (Con: ... Mostrar - Dark Theme) */
 .chat-participants-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6px 14px;
-  background: #fafafa;
-  border-bottom: 1px solid #eeeeee;
+  background: #1c1c1c;
+  border-bottom: 1px solid #2d2d2d;
 }
 
 .participants-text {
   font-size: 0.72rem;
-  color: #616161;
+  color: #9e9e9e;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -892,7 +887,7 @@ const handleEnviarMensaje = () => {
 
 .link-mostrar {
   font-size: 0.72rem;
-  color: #0288d1;
+  color: #29b6f6;
   cursor: pointer;
   font-weight: 500;
 }
@@ -902,91 +897,73 @@ const handleEnviarMensaje = () => {
 }
 
 /* ====================================================================
-   ÁREA DE MENSAJES Y BURBUJAS
+   ÁREA DE MENSAJES Y BURBUJAS (Ajustado al Dark Theme Oficial OFSC)
    ==================================================================== */
 .chat-messages-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 14px 180px 14px;
-  background: #f7f9fa;
+  padding: 14px 14px 180px 14px;
+  background: var(--ofs-bg-darker, #141414);
 }
 
 .chat-date-divider {
   text-align: center;
   font-size: 0.72rem;
-  color: #888888;
-  margin: 6px 0 12px 0;
+  color: var(--ofs-text-dim, #757575);
+  margin: 6px 0 14px 0;
 }
 
-.chat-bubble-general {
-  background: #ffffff;
+/* Burbujas OFSC Dark Theme (Fondo Neutro Oscuro de Tarjeta, Cero Tonos Rojos) */
+.chat-bubble-general,
+.chat-bubble-privado {
+  background: #252525 !important;
   border-radius: 6px;
   padding: 12px 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   max-width: 92%;
-  margin-bottom: 12px;
-  border: 1px solid #ebebeb;
+  margin-bottom: 14px;
+  border: 1px solid #3c3c3c !important;
+  position: relative;
+}
+
+/* Colita de bocadillo de chat adaptada al tema oscuro */
+.chat-bubble-general::before,
+.chat-bubble-privado::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid #252525 !important;
 }
 
 .msg-sender-name {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #0288d1;
+  color: #29b6f6;
   margin-bottom: 6px;
 }
 
 .msg-plantilla-text {
   font-family: inherit;
   font-size: 0.75rem;
-  color: #212121;
+  color: #f0f0f0 !important;
   line-height: 1.45;
   white-space: pre-wrap;
   margin: 0;
 }
 
-/* ====================================================================
-   CHAT PRIVADO (Página 7 del PDF)
-   ==================================================================== */
-.user-squircle-small {
-  width: 28px;
-  height: 28px;
-  background: #546e7a;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-right: 8px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.user-status-online-dot-small {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 7px;
-  height: 7px;
-  background: #4caf50;
-  border-radius: 50%;
-  border: 1px solid #ffffff;
-}
-
-.chat-bubble-privado {
-  background: #fbebee;
-  border: 1px solid #f8bbd0;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+.chat-bubble-privado .msg-plantilla-text {
+  color: #f0f0f0 !important;
 }
 
 .msg-time-status {
   text-align: right;
   font-size: 0.65rem;
-  color: #888888;
+  color: var(--ofs-text-dim, #888888);
   margin-top: 6px;
   display: flex;
   align-items: center;
@@ -996,27 +973,32 @@ const handleEnviarMensaje = () => {
 
 .envelope-icon {
   font-size: 0.75rem;
-  color: #9e9e9e;
+  color: var(--ofs-text-dim, #888888);
 }
 
-/* Barra Inferior de Entrada */
+/* Barra Inferior de Entrada (Dark Theme) */
 .chat-bottom-input-bar {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  background: #202020;
+  border-top: 1px solid #333333;
   gap: 8px;
 }
 
 .chat-text-field {
   flex: 1;
   padding: 8px 14px;
-  border: 1px solid #cfd8dc;
+  border: 1px solid #3c3c3c;
+  background: #2a2a2a;
+  color: #ffffff;
   border-radius: 20px;
   font-size: 0.8rem;
   outline: none;
-  background: #ffffff;
+}
+
+.chat-text-field::placeholder {
+  color: #757575;
 }
 
 .btn-send-privado {
@@ -1030,32 +1012,40 @@ const handleEnviarMensaje = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.btn-send-privado:hover {
+  background: #039be5;
 }
 
 .btn-attach-clip {
   background: none;
   border: none;
-  color: #616161;
+  color: #9e9e9e;
   cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-attach-clip:hover {
+  color: #ffffff;
 }
 
 .svg-clip-icon {
-  width: 20px;
-  height: 20px;
-  stroke: #616161;
+  color: currentColor;
 }
 
 /* ====================================================================
-   VISTA 3: INFORMACIÓN DE USUARIO (Página 6 del PDF)
+   VISTA 3: INFORMACIÓN DE USUARIO (Página 6 del PDF - Dark Theme)
    ==================================================================== */
 .user-info-body {
   flex: 1;
-  background: #ffffff;
+  background: #181818;
   padding: 24px 0 180px 0;
 }
 
@@ -1069,7 +1059,7 @@ const handleEnviarMensaje = () => {
 .user-squircle-avatar {
   width: 44px;
   height: 44px;
-  background: #546e7a;
+  background: #455a64;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -1089,13 +1079,13 @@ const handleEnviarMensaje = () => {
   height: 10px;
   background: #4caf50;
   border-radius: 50%;
-  border: 1.5px solid #ffffff;
+  border: 1.5px solid #181818;
 }
 
 .user-display-name {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #212121;
+  color: #ffffff;
 }
 
 .btn-nueva-conv-container {
@@ -1108,34 +1098,32 @@ const handleEnviarMensaje = () => {
   align-items: center;
   gap: 12px;
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: #242424;
+  border: 1px solid #3c3c3c;
   border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #1a237e;
+  color: #90caf9;
 }
 
 .btn-nueva-conversacion-ofsc:hover {
-  background: #f5f5f5;
+  background: #2c2c2c;
 }
 
 .svg-chat-line {
-  width: 22px;
-  height: 22px;
-  color: #212121;
+  color: #90caf9;
   flex-shrink: 0;
 }
 
 .conv-btn-text {
   font-size: 0.88rem;
   font-weight: 500;
-  color: #1a237e;
+  color: #90caf9;
 }
 
 .user-info-options {
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #2d2d2d;
   padding: 12px 16px;
 }
 
@@ -1147,20 +1135,20 @@ const handleEnviarMensaje = () => {
 .option-title-blue {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #0288d1;
+  color: #29b6f6;
 }
 
 .option-text-regular {
   font-size: 0.82rem;
-  color: #424242;
+  color: #b0b0b0;
 }
 
 /* ====================================================================
    RESALTADOS Y ANIMACIONES
    ==================================================================== */
 .item-target-highlight {
-  border: 2px solid #d32f2f !important;
-  background: #ffebee !important;
+  border: 2px solid #ef5350 !important;
+  background: rgba(229, 57, 53, 0.18) !important;
   animation: pulseHighlight 1.5s infinite;
 }
 
