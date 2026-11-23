@@ -34,7 +34,7 @@
       </button>
       <button
         type="button"
-        class="btn-tool"
+        class="btn-tool btn-fullscreen-toggle"
         @click="toggleFullscreen"
         :title="state.fullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa'"
       >
@@ -75,6 +75,8 @@ const { state, toggleFullscreen, resetSimulator, setModoGuiado } = useSimulator(
   gap: 4px;
   transition: all 0.2s ease;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-mode-tab:hover {
@@ -90,5 +92,12 @@ const { state, toggleFullscreen, resetSimulator, setModoGuiado } = useSimulator(
 .btn-mode-tab:last-child.active {
   background: #c62828;
   color: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .btn-mode-tab {
+    font-size: 0.68rem;
+    padding: 3px 7px;
+  }
 }
 </style>

@@ -14,6 +14,29 @@
       <div class="drawer-user-info" style="color:#ffd54f;margin-top:4px;">Instancia: amx-res-co</div>
     </div>
 
+    <!-- Selector de Modo de Simulación en Menú Lateral -->
+    <div class="drawer-mode-section">
+      <div class="drawer-mode-title">Modo de Simulación:</div>
+      <div class="drawer-mode-tabs">
+        <button
+          type="button"
+          class="btn-drawer-mode"
+          :class="{ active: state.ui.modoGuiado }"
+          @click="setModoGuiado(true)"
+        >
+          🧭 Guiado
+        </button>
+        <button
+          type="button"
+          class="btn-drawer-mode libre"
+          :class="{ active: !state.ui.modoGuiado }"
+          @click="setModoGuiado(false)"
+        >
+          🎯 Libre
+        </button>
+      </div>
+    </div>
+
     <div class="drawer-menu-list">
       <div class="drawer-item" @click="goToActivityList">
         <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
@@ -43,7 +66,15 @@
 <script setup>
 import { useSimulator } from '../composables/useSimulator';
 
-const { state, closeDrawer, logout, resetSimulator, showScreen, openColorimetria } = useSimulator();
+const {
+  state,
+  closeDrawer,
+  logout,
+  resetSimulator,
+  showScreen,
+  openColorimetria,
+  setModoGuiado
+} = useSimulator();
 
 const goToActivityList = () => {
   closeDrawer();
@@ -60,3 +91,58 @@ const handleResetSimulator = () => {
   resetSimulator();
 };
 </script>
+
+<style scoped>
+.drawer-mode-section {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.drawer-mode-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #9e9e9e;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.drawer-mode-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-drawer-mode {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #b0b0b0;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-drawer-mode.active {
+  background: #2e7d32;
+  color: #ffffff;
+  border-color: #4caf50;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.btn-drawer-mode.libre.active {
+  background: #c62828;
+  color: #ffffff;
+  border-color: #ef5350;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+</style>
