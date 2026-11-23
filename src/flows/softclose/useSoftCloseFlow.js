@@ -17,7 +17,7 @@ export function getInitialSoftCloseState() {
     softCloseFormData: {
       recibidoSatisfaccion: 'ALEJANDRINA RODRIGUEZ',
       tipoId: 'Cédula Ciudadanía',
-      identificacion: '1020849050',
+      identificacion: '1098765432',
       telefonoEncuesta: '3101234567',
       emailContacto: 'rodriguezalejandrina@gmail.com',
       firmaDataUrl: ''

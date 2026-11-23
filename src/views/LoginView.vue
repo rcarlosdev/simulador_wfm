@@ -53,7 +53,7 @@
           <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24">
             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
           </svg>
-          Técnicos de Prueba (Clic para ingresar):
+          Técnico de Prueba (Clic para ingresar):
         </div>
 
         <div
@@ -79,7 +79,7 @@ import { useSimulator } from '../composables/useSimulator';
 
 const { users, login } = useSimulator();
 
-const cedula = ref('1000123456');
+const cedula = ref('1234567890');
 const password = ref('Claro2026*');
 const passwordVisible = ref(false);
 

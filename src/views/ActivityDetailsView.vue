@@ -266,9 +266,10 @@
         <!-- Opciones dinámicas para Cliente -->
         <template v-else>
           <template v-if="act.estado === 'pendiente'">
-            <div class="context-menu-item" style="color:#00e5ff;font-weight:700;" @click="handleAction('iniciar_ruta')">🚗 Iniciar</div>
+            <div class="context-menu-item" style="color:#00e5ff;font-weight:700;" @click="handleAction('iniciar_ruta')">🚗 Iniciar Desplazamiento</div>
+            <div class="context-menu-item" style="color:#76ff03;font-weight:700;" @click="handleAction('iniciar_predio')">🟢 Iniciar actividad (Comenzar en predio)</div>
             <div class="context-menu-item" @click="handleAction('acciones')">Acciones</div>
-            <div class="context-menu-item" @click="handleAction('historial')">Historial Acciones</div>
+            <div class="context-menu-item" style="color:#4fc3f7;font-weight:700;" @click="handleAction('activacion_auto')">Activacion Servicios</div>
             <div class="context-menu-item" @click="handleAction('inventario')">Inventario</div>
             <div class="context-menu-item" @click="handleAction('ir_a')">Ir a</div>
             <div
@@ -374,6 +375,18 @@
       En el menú de tres puntos (...), pulsa <strong>Completar</strong> para finalizar la actividad de almacén.
     </FlowHintBox>
 
+    <!-- Pistas para actividad Brownfield en estado pendiente -->
+    <FlowHintBox
+      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && (act.subtipo === 'BROWNFIELD' || act.isBrownfield)"
+      step="0"
+      title="Actividad Brownfield - Por Iniciar"
+    >
+      Orden <strong>BROWNFIELD (Migración FTTH)</strong> pendiente. Despliega el menú (···) y a tu discreción puedes:
+      <br>• <strong>Iniciar Desplazamiento</strong> para simular el viaje en Waze/Maps.
+      <br>• <strong>Iniciar actividad (Comenzar en predio)</strong> para empezar de inmediato.
+      <br>• O acceder directamente a <strong>Activacion Servicios</strong> o <strong>Inventario</strong> para repasar el flujo.
+    </FlowHintBox>
+
     <!-- PISTAS FLOTANTES DEL PROCESO DE DESPLAZAMIENTO -->
     <!-- Paso 2 (DESPLAZAMIENTO.pdf Pág 3) -->
     <FlowHintBox
@@ -447,6 +460,11 @@ import { useSimulator, formatDuration } from '../composables/useSimulator';
 import { useCierreFlow } from '../flows/cierre/useCierreFlow';
 import { usePlanillaNotasFlow } from '../flows/planilla_notas/usePlanillaNotasFlow';
 import { useMapaCalorFlow } from '../flows/mapa_calor/useMapaCalorFlow';
+import {
+  validarCierreOrdenCliente,
+  validarFinalizacionAlmacen,
+  ejecutarValidacionConFeedback
+} from '../core/businessRules';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const route = useRoute();
@@ -536,7 +554,7 @@ const currentTimerFormatted = computed(() => {
 const verDatosSuscriptor = () => {
   openModal(
     'Datos del Suscriptor',
-    `<strong>Cliente:</strong> ${act.value?.cliente || 'DANIELA CRUZ'}<br>
+    `<strong>Cliente:</strong> ${act.value?.cliente || 'CLIENTE DEMO'}<br>
      <strong>Cuenta:</strong> ${act.value?.cuenta || '63993686'}<br>
      <strong>Dirección:</strong> ${(act.value?.direccion || '').replace(/\n/g, ' ')}<br>
      <strong>Estado Suscriptor:</strong> Activo · Sin bloqueos`,
@@ -567,9 +585,13 @@ const handleAction = (actionKey) => {
 
     case 'completar':
       if (current.tipo === 'almacen') {
+        const valAlmacen = validarFinalizacionAlmacen();
+        if (!ejecutarValidacionConFeedback(valAlmacen)) return;
         advanceAlmacenStep(8);
         showScreen('/finalizar-actividad');
       } else {
+        const valCliente = validarCierreOrdenCliente();
+        if (!ejecutarValidacionConFeedback(valCliente)) return;
         advanceCierreStep(4);
         showScreen('/completar-ot');
       }
@@ -595,8 +617,10 @@ const handleAction = (actionKey) => {
       break;
 
     case 'inventario':
-      state.softCloseProgress.iniciado = true;
-      state.softCloseProgress.currentStep = 4;
+      if (activity.value?.subtipo !== 'BROWNFIELD' && !activity.value?.isBrownfield) {
+        state.softCloseProgress.iniciado = true;
+        state.softCloseProgress.currentStep = 4;
+      }
       showScreen('/inventario');
       break;
 

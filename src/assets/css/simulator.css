@@ -1615,6 +1615,12 @@ button,
   border-left: 4px solid var(--ofs-green);
 }
 
+.ofsc-alert-warning {
+  background: #3e2710;
+  color: #ffe0b2;
+  border-left: 4px solid #ff9800;
+}
+
 .alert-icon {
   font-weight: 700;
   font-size: 0.9rem;

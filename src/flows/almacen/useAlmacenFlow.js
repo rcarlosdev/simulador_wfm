@@ -79,7 +79,11 @@ export function confirmarInicioAlmacen(onSuccess = null) {
  * Guardar formulario oficial de Check Inicio (Paso 6)
  */
 export function guardarCheckInicio(formData, onSuccess = null) {
-  if (formData) {
+  if (typeof formData === 'function') {
+    onSuccess = formData;
+    formData = null;
+  }
+  if (formData && typeof formData === 'object') {
     Object.assign(almacenState.checkFormData, formData);
   }
   almacenState.checkRealizado = true;
@@ -104,7 +108,11 @@ export function guardarCheckInicio(formData, onSuccess = null) {
  * Finalizar oficialmente actividad de almacén (Paso 8)
  */
 export function finalizarActividadAlmacen(formData, onSuccess = null) {
-  if (formData) {
+  if (typeof formData === 'function') {
+    onSuccess = formData;
+    formData = null;
+  }
+  if (formData && typeof formData === 'object') {
     Object.assign(almacenState.finalizarFormData, formData);
   }
 

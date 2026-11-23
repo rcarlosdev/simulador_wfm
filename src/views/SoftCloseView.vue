@@ -179,7 +179,7 @@ const currentStep = computed(() => state.softCloseProgress?.currentStep || 19);
 const formData = reactive({
   recibidoSatisfaccion: state.softCloseProgress?.softCloseFormData?.recibidoSatisfaccion || 'ALEJANDRINA RODRIGUEZ',
   tipoId: state.softCloseProgress?.softCloseFormData?.tipoId || 'Cédula Ciudadanía',
-  identificacion: state.softCloseProgress?.softCloseFormData?.identificacion || '1020849050',
+  identificacion: state.softCloseProgress?.softCloseFormData?.identificacion || '1098765432',
   telefonoEncuesta: state.softCloseProgress?.softCloseFormData?.telefonoEncuesta || '3101234567',
   emailContacto: state.softCloseProgress?.softCloseFormData?.emailContacto || 'rodriguezalejandrina@gmail.com'
 });

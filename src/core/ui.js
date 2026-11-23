@@ -1,5 +1,4 @@
 import { reactive } from 'vue';
-import router from '../router';
 
 /**
  * Módulo de Estado Global de Interfaz de Usuario (UI)
@@ -141,9 +140,17 @@ const screenRoutes = {
   'chat': '/chat'
 };
 
+let activeRouter = null;
+
+export function setRouter(r) {
+  activeRouter = r;
+}
+
 export function showScreen(screenIdOrPath) {
   uiState.contextMenuOpen = false;
   uiState.drawerOpen = false;
   const targetRoute = screenRoutes[screenIdOrPath] || screenIdOrPath;
-  router.push(targetRoute);
+  if (activeRouter && typeof activeRouter.push === 'function') {
+    activeRouter.push(targetRoute);
+  }
 }

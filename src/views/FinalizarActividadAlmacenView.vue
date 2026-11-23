@@ -118,7 +118,11 @@ const nextActivity = computed(() => {
   return acts.find(a => a.tipo !== 'almacen') || null;
 });
 
-const nextActivityName = computed(() => nextActivity.value?.cliente?.nombre || 'DANIELA CRUZ');
+const nextActivityName = computed(() => {
+  const cliente = nextActivity.value?.cliente;
+  if (!cliente) return 'CLIENTE DEMO';
+  return typeof cliente === 'string' ? cliente : (cliente.nombre || 'CLIENTE DEMO');
+});
 const nextActivityOt = computed(() => nextActivity.value?.cliente?.ot || '481787893_O_CO_661');
 
 const capturarGps = () => {

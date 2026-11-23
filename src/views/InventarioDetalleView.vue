@@ -7,7 +7,10 @@
       </button>
       <div style="display:flex; flex-direction:column; overflow:hidden;">
         <span class="app-bar-title" style="line-height: 1.2;">Detalle de inventario</span>
-        <span style="font-size: 0.68rem; color: #ffcdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        <span v-if="isBrownfield" style="font-size: 0.68rem; color: #ffcdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          ITV - N2P - NL 6105RC - 254889543645 - {{ state.brownfieldProgress?.reutilizacionComandoEjecutado ? 'Ok, Tiempo (seg): 20.' : 'Cliente' }}
+        </span>
+        <span v-else style="font-size: 0.68rem; color: #ffcdd2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           MTA - CG1 - CGA0112 - 38:3F:B3:97:5C:1B - Ok,Tiempo (seg): 49,
         </span>
       </div>
@@ -15,7 +18,7 @@
         <button
           type="button"
           class="app-bar-btn btn-dots"
-          :class="{ 'btn-highlight': currentStep === 6 || currentStep === 11 }"
+          :class="{ 'btn-highlight': isBrownfield ? (!state.brownfieldProgress?.reutilizacionComandoEjecutado) : (currentStep === 6 || currentStep === 11) }"
           title="Menú de opciones"
           @click="toggleMenu"
         >
@@ -28,7 +31,7 @@
     <div v-if="menuOpen" class="inv-dropdown-menu" @click.stop>
       <div
         class="inv-dropdown-item"
-        :class="{ 'item-target': currentStep === 12 }"
+        :class="{ 'item-target': !isBrownfield && currentStep === 12 }"
         @click="irAAcciones"
       >
         Acciones
@@ -38,7 +41,7 @@
       </div>
       <div
         class="inv-dropdown-item"
-        :class="{ 'item-target': currentStep === 6 }"
+        :class="{ 'item-target': isBrownfield ? (!state.brownfieldProgress?.reutilizacionComandoEjecutado) : (currentStep === 6) }"
         @click="irAComandos"
       >
         Comandos Activacion
@@ -47,65 +50,124 @@
 
     <!-- Contenido Scrollable con Metadatos del Equipo -->
     <div class="screen-scroll-body" style="padding: 14px 16px 180px 16px;" @click="menuOpen = false">
-      <div class="inv-field-group">
-        <div class="inv-field-label">Agrupación de inventarios</div>
-        <div class="inv-field-value">instalado</div>
-      </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Tipo Inventario</div>
-        <div class="inv-field-value">TECHNICOLOR CGA0112</div>
-      </div>
+      <!-- Metadatos de Equipo en Brownfield (Reutilización Cliente) -->
+      <template v-if="isBrownfield">
+        <div class="inv-field-group">
+          <div class="inv-field-label">Agrupación de inventarios</div>
+          <div class="inv-field-value">cliente</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Tipo Inventario</div>
-        <div class="inv-field-value">MTA</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Tipo Inventario</div>
+          <div class="inv-field-value">NEWLAND NL 6105RC</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Serial</div>
-        <div class="inv-field-value">38:3F:B3:97:5C:1B</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Tipo Inventario</div>
+          <div class="inv-field-value">ITV</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Modelo</div>
-        <div class="inv-field-value">CGA0112</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Serial</div>
+          <div class="inv-field-value">254889543645</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Fabricante</div>
-        <div class="inv-field-value">CG1</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Modelo</div>
+          <div class="inv-field-value">NL 6105RC</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">MAC Address</div>
-        <div class="inv-field-value">38:3F:B3:97:5C:1C</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Fabricante</div>
+          <div class="inv-field-value">N2P</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Id Corto del servicio</div>
-        <div class="inv-field-value">3</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">MAC Address</div>
+          <div class="inv-field-value">A8:F4:70:C2:84:89</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Descripcion Servicio</div>
-        <div class="inv-field-value">INT 5+95 MB;MODEM WIFI;TELEFONIA</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Id Corto del servicio</div>
+          <div class="inv-field-value">{{ state.brownfieldProgress?.reutilizacionComandoEjecutado ? 1 : 2 }}</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Estado Actual</div>
-        <div class="inv-field-value">Instalado</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Descripcion Servicio</div>
+          <div class="inv-field-value">{{ state.brownfieldProgress?.reutilizacionComandoEjecutado ? '1 - TV IP DIG PL;WIN+' : '2 - ARR DECO ADI;TV IP DIG PL' }}</div>
+        </div>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Fuente</div>
-        <div class="inv-field-value">FUENTE 12V 2500MA 2.5X5.5X9.5MM</div>
-      </div>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Estado Actual</div>
+          <div class="inv-field-value" :style="{ color: state.brownfieldProgress?.reutilizacionComandoEjecutado ? '#81c784' : '#ffb74d' }">
+            {{ state.brownfieldProgress?.reutilizacionComandoEjecutado ? 'EXITOSO - Asociado' : 'Cliente (Reutilizable)' }}
+          </div>
+        </div>
+      </template>
 
-      <div class="inv-field-group">
-        <div class="inv-field-label">Puerto 1</div>
-        <div class="inv-field-value">+576019353116</div>
-      </div>
+      <!-- Metadatos de Equipo Estándar (MTA) -->
+      <template v-else>
+        <div class="inv-field-group">
+          <div class="inv-field-label">Agrupación de inventarios</div>
+          <div class="inv-field-value">instalado</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Tipo Inventario</div>
+          <div class="inv-field-value">TECHNICOLOR CGA0112</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Tipo Inventario</div>
+          <div class="inv-field-value">MTA</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Serial</div>
+          <div class="inv-field-value">38:3F:B3:97:5C:1B</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Modelo</div>
+          <div class="inv-field-value">CGA0112</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Fabricante</div>
+          <div class="inv-field-value">CG1</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">MAC Address</div>
+          <div class="inv-field-value">38:3F:B3:97:5C:1C</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Id Corto del servicio</div>
+          <div class="inv-field-value">3</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Descripcion Servicio</div>
+          <div class="inv-field-value">INT 5+95 MB;MODEM WIFI;TELEFONIA</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Estado Actual</div>
+          <div class="inv-field-value">Instalado</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Fuente</div>
+          <div class="inv-field-value">FUENTE 12V 2500MA 2.5X5.5X9.5MM</div>
+        </div>
+
+        <div class="inv-field-group">
+          <div class="inv-field-label">Puerto 1</div>
+          <div class="inv-field-value">+576019353116</div>
+        </div>
+      </template>
 
       <!-- SECCIÓN TRAS VALIDAR NIVELES MTA (Páginas 19 y 20 - Paso 16) -->
       <div v-if="state.softCloseProgress?.mtaNivelesValidados" class="tech-params-section">
@@ -165,44 +227,71 @@
     </div>
 
     <!-- Pistas Flotantes según el Paso -->
-    <!-- Paso 6 (SotfClose.pdf Pág 5) -->
-    <FlowHintBox
-      v-if="currentStep === 6 && !menuOpen"
-      step="6"
-    >
-      Despliega el menú a través de los tres puntos ubicados en la parte superior derecha y selecciona <strong>Comandos activación</strong>.
-    </FlowHintBox>
+    <!-- Flujo Brownfield (Reutilización de equipo cliente) -->
+    <template v-if="isBrownfield">
+      <FlowHintBox
+        v-if="!menuOpen && !state.brownfieldProgress?.reutilizacionComandoEjecutado"
+        step="5"
+      >
+        Despliega el menú a través de los tres puntos (...) ubicados en la parte superior derecha y selecciona <strong>Comandos Activacion</strong>.
+      </FlowHintBox>
 
-    <FlowHintBox
-      v-else-if="currentStep === 6 && menuOpen"
-      step="6"
-    >
-      Allí selecciona la opción <strong>Comandos activación</strong>.
-    </FlowHintBox>
+      <FlowHintBox
+        v-else-if="menuOpen && !state.brownfieldProgress?.reutilizacionComandoEjecutado"
+        step="5"
+      >
+        Allí selecciona la opción <strong>Comandos Activacion</strong> para abrir el portal de comandos.
+      </FlowHintBox>
 
-    <!-- Paso 11 (SotfClose.pdf Pág 12) -->
-    <FlowHintBox
-      v-else-if="currentStep === 11 && !menuOpen"
-      step="11"
-    >
-      En la pantalla <strong>Detalle de inventario</strong>, despliega de nuevo el menú a través de los tres puntos ubicados en la parte superior derecha.
-    </FlowHintBox>
+      <FlowHintBox
+        v-else-if="state.brownfieldProgress?.reutilizacionComandoEjecutado"
+        step="6"
+      >
+        ✓ Decodificador reutilizado exitosamente con Id Corto 1. Presiona la flecha atrás para volver al inventario.
+      </FlowHintBox>
+    </template>
 
-    <!-- Paso 12 (SotfClose.pdf Pág 13) -->
-    <FlowHintBox
-      v-else-if="(currentStep === 11 || currentStep === 12) && menuOpen"
-      step="12"
-    >
-      Allí selecciona la opción <strong>Acciones</strong>.
-    </FlowHintBox>
+    <!-- Flujo Estándar HFC (SoftClose) -->
+    <template v-else>
+      <!-- Paso 6 (SotfClose.pdf Pág 5) -->
+      <FlowHintBox
+        v-if="currentStep === 6 && !menuOpen"
+        step="6"
+      >
+        Despliega el menú a través de los tres puntos ubicados en la parte superior derecha y selecciona <strong>Comandos activación</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 16 (SotfClose.pdf Pág 20) -->
-    <FlowHintBox
-      v-else-if="currentStep === 16"
-      step="16"
-    >
-      En la sección <strong>Parámetros técnicos</strong>, valida que los niveles sean óptimos.
-    </FlowHintBox>
+      <FlowHintBox
+        v-else-if="currentStep === 6 && menuOpen"
+        step="6"
+      >
+        Allí selecciona la opción <strong>Comandos activación</strong>.
+      </FlowHintBox>
+
+      <!-- Paso 11 (SotfClose.pdf Pág 12) -->
+      <FlowHintBox
+        v-else-if="currentStep === 11 && !menuOpen"
+        step="11"
+      >
+        En la pantalla <strong>Detalle de inventario</strong>, despliega de nuevo el menú a través de los tres puntos ubicados en la parte superior derecha.
+      </FlowHintBox>
+
+      <!-- Paso 12 (SotfClose.pdf Pág 13) -->
+      <FlowHintBox
+        v-else-if="(currentStep === 11 || currentStep === 12) && menuOpen"
+        step="12"
+      >
+        Allí selecciona la opción <strong>Acciones</strong>.
+      </FlowHintBox>
+
+      <!-- Paso 16 (SotfClose.pdf Pág 20) -->
+      <FlowHintBox
+        v-else-if="currentStep === 16"
+        step="16"
+      >
+        En la sección <strong>Parámetros técnicos</strong>, valida que los niveles sean óptimos.
+      </FlowHintBox>
+    </template>
   </div>
 </template>
 
@@ -214,6 +303,7 @@ import FlowHintBox from '../components/FlowHintBox.vue';
 const { state, showScreen, showToast, advanceSoftCloseStep } = useSimulator();
 
 const menuOpen = ref(false);
+const isBrownfield = computed(() => state.currentActivity?.subtipo === 'BROWNFIELD' || state.currentActivity?.isBrownfield === true);
 const currentStep = computed(() => state.softCloseProgress?.currentStep || 6);
 
 const toggleMenu = () => {

@@ -12,9 +12,9 @@ export function getInitialPlanillaNotasState() {
     subView: 'lista', // 'lista' | 'chat_delta_general' | 'info_usuario' | 'chat_delta_privado'
     activeTab: 'chats', // 'chats' | 'historia' | 'notificaciones'
     deltaUser: {
-      nombre: 'EZENTIS_DIAZ REYES ALISSON NATALLY',
-      shortName: 'EZENTIS_DIAZ REYES ALI...',
-      initials: 'ED',
+      nombre: 'SOPORTE_DELTA_DEMO',
+      shortName: 'SOPORTE_DELTA...',
+      initials: 'SD',
       rol: 'Soporte Delta Aliado',
       online: true
     },
@@ -52,7 +52,7 @@ Tecnico`,
       {
         id: 1,
         sender: 'tecnico',
-        author: 'Joseb Garcia',
+        author: 'CARLOS PEREZ',
         time: '10:46 AM',
         text: `Equipos Recogidos: No
 
@@ -72,22 +72,22 @@ Card: 25487167860V
 1 Punto de telefono: 2 mts
 2 Punto de telefono: 5 mts
 
-Tecnico: Joseb garcia
+Tecnico: CARLOS PEREZ
 Sap: 219544
 
-Cliente: ALEJANDRINA RODRIGUEZ
-Atiende: ALEJANDRINA RODRIGUEZ
-Cc: 1020849050
-Celular: 3134355872
+Cliente: CLIENTE PRUEBA
+Atiende: CLIENTE PRUEBA
+Cc: 1098765432
+Celular: 3001234567
 
-Supervisor: Roger encizo
+Supervisor: SUPERVISOR DEMO
 
 OBSERVACIONES: Se realiza instalacion no cabliada de 1 modem, 2 decos, 2 punto de telefono. se entregan 2 controles configurados. Se dejan unos puntos sueltos a peticion del usuario.`
       },
       {
         id: 2,
         sender: 'tecnico',
-        author: 'Joseb Garcia',
+        author: 'CARLOS PEREZ',
         time: '10:46 AM',
         text: 'Buenos dias compañera me regala facturacion porfa'
       }
