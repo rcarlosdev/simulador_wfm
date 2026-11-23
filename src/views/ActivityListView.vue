@@ -349,6 +349,7 @@
 import { ref, computed } from 'vue';
 import { useSimulator, formatDuration } from '../composables/useSimulator';
 import { useCierreFlow } from '../flows/cierre/useCierreFlow';
+import { validarDesactivacionRuta, ejecutarValidacionConFeedback } from '../core/businessRules';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const {
@@ -484,6 +485,10 @@ const irAActivarRuta = () => {
 
 const irADesactivarRuta = () => {
   menuListaAbierto.value = false;
+  const acts = state.currentUser?.actividades || [];
+  const valRuta = validarDesactivacionRuta(acts);
+  if (!ejecutarValidacionConFeedback(valRuta)) return;
+
   advanceCierreStep(6);
   showScreen('/desactivar-ruta');
 };
@@ -551,8 +556,24 @@ const formatTitle = (text) => {
   return text.replace(/\n/g, '<br>');
 };
 
+function parseHorarioToMinutes(act) {
+  if (!act) return 9999;
+  const timeStr = act.horario || act.inicio_fin || act.ventana_entrega || act.titulo || '';
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  if (!match) return 9999;
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const ampm = match[3] ? match[3].toUpperCase() : null;
+
+  if (ampm === 'PM' && hours < 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+
+  return hours * 60 + minutes;
+}
+
 const actividades = computed(() => {
-  return state.currentUser?.actividades || [];
+  const acts = [...(state.currentUser?.actividades || [])];
+  return acts.sort((a, b) => parseHorarioToMinutes(a) - parseHorarioToMinutes(b));
 });
 
 const pendientes = computed(() => actividades.value.filter(a => a.estado === 'pendiente'));

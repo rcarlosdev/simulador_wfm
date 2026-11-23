@@ -29,7 +29,7 @@
       <!-- Datos de Orden -->
       <div class="cmd-meta-row">
         <div>
-          <span class="cmd-meta-label">Orden:</span> 371940209 &nbsp;&nbsp;
+          <span class="cmd-meta-label">Orden:</span> {{ isBrownfield ? (state.currentActivity?.cuenta || '381122773') : '371940209' }} &nbsp;&nbsp;
           <span class="cmd-meta-label">Tipo orden:</span> 0
         </div>
         <button type="button" class="btn-refresh-icon" @click="showToast('Actualizando telemetría...')">🔄</button>
@@ -37,17 +37,27 @@
       <div class="cmd-meta-row" style="margin-top: 2px;">
         <div>
           <span class="cmd-meta-label">ActivityId:</span> 93713911 &nbsp;&nbsp;
-          <span class="cmd-meta-label">Usuario:</span> {{ state.currentUser?.cedula || '1082939957' }}
+          <span class="cmd-meta-label">Usuario:</span> {{ state.currentUser?.cedula || '1234567890' }}
         </div>
       </div>
 
-      <!-- Sección Verde: EQUIPOS - SERIAL: 383FB3975C1B -->
+      <!-- Sección Verde: EQUIPOS -->
       <div class="cmd-section-bar">
-        EQUIPOS - SERIAL: 383FB3975C1B
+        EQUIPOS - SERIAL: {{ isBrownfield ? '254889543645' : '383FB3975C1B' }}
       </div>
 
       <div class="cmd-equipment-details">
-        <div class="cmd-eq-grid">
+        <div v-if="isBrownfield" class="cmd-eq-grid">
+          <div><span class="cmd-bold">Tipo:</span> ITV</div>
+          <div><span class="cmd-bold">Fabricante:</span> N2P</div>
+          <div><span class="cmd-bold">Mac:</span> A8:F4:70:C2:84:89</div>
+          <div><span class="cmd-bold">Serial:</span> 254889543645</div>
+          <div style="grid-column: span 2;"><span class="cmd-bold">Tecnología:</span> IPTV NEWLAND NL 6105RC</div>
+          <div style="grid-column: span 2;"><span class="cmd-bold">Familia:</span> TELEVISION</div>
+          <div style="grid-column: span 2; color: #ffb74d;"><span class="cmd-bold">Ubicación:</span> No se puedo encontrar la ubicación del equipo</div>
+        </div>
+
+        <div v-else class="cmd-eq-grid">
           <div><span class="cmd-bold">Tipo:</span> MTA</div>
           <div><span class="cmd-bold">Fabricante:</span> CG1</div>
           <div><span class="cmd-bold">Mac:</span> 38:3F:B3:97:5C:1C</div>
@@ -58,9 +68,9 @@
         </div>
       </div>
 
-      <!-- Sección Verde: SERVICIOS - CUENTA: 7730852 -->
+      <!-- Sección Verde: SERVICIOS -->
       <div class="cmd-section-bar" style="margin-top: 10px;">
-        SERVICIOS - CUENTA: 7730852
+        SERVICIOS - CUENTA: {{ isBrownfield ? (state.currentActivity?.cuenta || '23852718') : '7730852' }}
       </div>
 
       <div class="cmd-tabs-bar">
@@ -93,7 +103,9 @@
         <div class="cmd-select-wrapper">
           <select
             class="cmd-select-control"
-            :class="{ 'select-target': currentStep === 8 }"
+            :class="{
+              'select-target': (!isBrownfield && currentStep === 8) || (isBrownfield && !state.brownfieldProgress?.reutilizacionComandoEjecutado)
+            }"
             v-model="selectedAction"
             @change="handleActionChange"
           >
@@ -104,6 +116,49 @@
             <option value="Wifi">Comandos WIFI</option>
             <option value="Cambiar">Cambiar servicio</option>
           </select>
+        </div>
+      </div>
+
+      <!-- ALERTA VERDE OFSC / COMANDOS CLARO (Página 62 del PDF) -->
+      <div v-if="state.brownfieldProgress?.reutilizacionComandoEjecutado" style="background:#1b5e20;color:#c8e6c9;padding:10px 14px;border-radius:4px;margin-top:14px;font-weight:700;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.1rem;">✔</span>
+        <span>Ejecución de Comando: CAMBIAR_SERVICIO exitoso</span>
+      </div>
+
+      <!-- REGISTRO DE ACCIONES PARA CAMBIAR SERVICIO (BROWNFIELD) -->
+      <div v-if="state.brownfieldProgress?.reutilizacionComandoEjecutado" class="cmd-results-block">
+        <div class="cmd-section-bar" style="margin-top: 14px; text-align: center;">
+          REGISTRO DE ACCIONES
+        </div>
+        <div class="cmd-action-log">
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Resultado</span>
+            <span class="cmd-log-val ok-check">✔</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Comando</span>
+            <span class="cmd-log-val">CAMBIAR_SERVICIO</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Acción</span>
+            <span class="cmd-log-val">CAMBIAR_SERVICIO</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Detalle</span>
+            <span class="cmd-log-val">Id Corto: 1 - TV IP DIG PL;WIN+ aplicado correctamente</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Estado</span>
+            <span class="cmd-log-val" style="color: #81c784; font-weight: 700;">EXITOSO</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Fecha Inicio Ejecución</span>
+            <span class="cmd-log-val">15/02/2023 10:25:40</span>
+          </div>
+          <div class="cmd-log-row">
+            <span class="cmd-log-label">Fecha Fin Ejecución</span>
+            <span class="cmd-log-val">15/02/2023 10:25:42</span>
+          </div>
         </div>
       </div>
 
@@ -220,30 +275,97 @@
       </div>
     </div>
 
+    <!-- MODAL POPUP: CAMBIAR SERVICIO (BROWNFIELD Páginas 58 a 61) -->
+    <div v-if="modalCambiarServicioOpen" class="cmd-modal-backdrop" @click="modalCambiarServicioOpen = false">
+      <div class="cmd-modal-dialog" @click.stop style="max-width:440px;">
+        <div class="cmd-modal-header">
+          <span class="cmd-modal-title">Cambiar Servicio</span>
+          <button type="button" class="cmd-modal-close" @click="modalCambiarServicioOpen = false">✕</button>
+        </div>
+
+        <div class="cmd-modal-body">
+          <p style="font-size:0.82rem;color:#424242;margin-bottom:10px;">
+            Seleccione el servicio destino al que migrará el decodificador reutilizado:
+          </p>
+
+          <div
+            style="border:1.5px solid #0288d1;border-radius:4px;padding:10px 12px;background:#e1f5fe;display:flex;align-items:center;gap:10px;cursor:pointer;"
+          >
+            <input type="radio" checked name="target-servicio" />
+            <div>
+              <div style="font-size:0.88rem;font-weight:700;color:#01579b;">Id Corto: 1</div>
+              <div style="font-size:0.8rem;color:#0277bd;">TV IP DIG PL;WIN+ (PRINCIPAL)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cmd-modal-footer">
+          <button type="button" class="cmd-btn-cancel" @click="modalCambiarServicioOpen = false">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="cmd-btn-execute"
+            :class="{ 'btn-highlight': isBrownfield && !state.brownfieldProgress?.reutilizacionComandoEjecutado }"
+            @click="confirmarCambiarServicio"
+          >
+            Ejecutar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- PISTAS FLOTANTES -->
-    <!-- Paso 8 (SotfClose.pdf Pág 8) -->
-    <FlowHintBox
-      v-if="currentStep === 8 && !modalNivelesOpen"
-      step="8"
-    >
-      Enseguida, selecciona la opción <strong>Niveles</strong>.
-    </FlowHintBox>
+    <!-- Flujo Brownfield (Comando Cambiar Servicio) -->
+    <template v-if="isBrownfield">
+      <FlowHintBox
+        v-if="!state.brownfieldProgress?.reutilizacionComandoEjecutado && !modalCambiarServicioOpen"
+        step="5"
+      >
+        Despliega el selector de <strong>Acción</strong> y selecciona la opción <strong>Cambiar servicio</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 9 (SotfClose.pdf Pág 9) -->
-    <FlowHintBox
-      v-else-if="currentStep === 9 || modalNivelesOpen"
-      step="9"
-    >
-      En la previsualización, haz clic sobre la opción <strong>Ejecutar</strong>.
-    </FlowHintBox>
+      <FlowHintBox
+        v-else-if="modalCambiarServicioOpen"
+        step="5"
+      >
+        Verifica la selección del servicio destino con <strong>Id Corto: 1</strong> y haz clic sobre el botón <strong>Ejecutar</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 10 (SotfClose.pdf Pág 11) -->
-    <FlowHintBox
-      v-else-if="currentStep === 10"
-      step="10"
-    >
-      En la sección <strong>Niveles</strong>, verifica que la columna <strong>Evaluación nivel</strong> esté OK y presiona la flecha para volver a la pantalla anterior.
-    </FlowHintBox>
+      <FlowHintBox
+        v-else-if="state.brownfieldProgress?.reutilizacionComandoEjecutado"
+        step="5"
+      >
+        ✓ ¡Comando CAMBIAR_SERVICIO ejecutado exitosamente! Presiona la flecha atrás en la barra roja superior para volver al inventario.
+      </FlowHintBox>
+    </template>
+
+    <!-- Flujo Estándar HFC (Niveles SoftClose) -->
+    <template v-else>
+      <!-- Paso 8 (SotfClose.pdf Pág 8) -->
+      <FlowHintBox
+        v-if="currentStep === 8 && !modalNivelesOpen"
+        step="8"
+      >
+        Enseguida, selecciona la opción <strong>Niveles</strong>.
+      </FlowHintBox>
+
+      <!-- Paso 9 (SotfClose.pdf Pág 9) -->
+      <FlowHintBox
+        v-else-if="currentStep === 9 || modalNivelesOpen"
+        step="9"
+      >
+        En la previsualización, haz clic sobre la opción <strong>Ejecutar</strong>.
+      </FlowHintBox>
+
+      <!-- Paso 10 (SotfClose.pdf Pág 11) -->
+      <FlowHintBox
+        v-else-if="currentStep === 10"
+        step="10"
+      >
+        En la sección <strong>Niveles</strong>, verifica que la columna <strong>Evaluación nivel</strong> esté OK y presiona la flecha para volver a la pantalla anterior.
+      </FlowHintBox>
+    </template>
   </div>
 </template>
 
@@ -252,10 +374,23 @@ import { ref, computed } from 'vue';
 import { useSimulator } from '../composables/useSimulator';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
-const { state, showScreen, showToast, advanceSoftCloseStep } = useSimulator();
+const {
+  state,
+  showScreen,
+  showToast,
+  advanceSoftCloseStep,
+  ejecutarComandoCambiarServicio
+} = useSimulator();
 
-const selectedAction = ref(state.softCloseProgress?.nivelesEjecutados ? 'Niveles' : '');
+const isBrownfield = computed(() => state.currentActivity?.subtipo === 'BROWNFIELD' || state.currentActivity?.isBrownfield === true);
+
+const selectedAction = ref(
+  isBrownfield.value
+    ? (state.brownfieldProgress?.reutilizacionComandoEjecutado ? 'Cambiar' : '')
+    : (state.softCloseProgress?.nivelesEjecutados ? 'Niveles' : '')
+);
 const modalNivelesOpen = ref(false);
+const modalCambiarServicioOpen = ref(false);
 
 const currentStep = computed(() => state.softCloseProgress?.currentStep || 8);
 
@@ -263,6 +398,8 @@ const handleActionChange = () => {
   if (selectedAction.value === 'Niveles') {
     modalNivelesOpen.value = true;
     advanceSoftCloseStep(9);
+  } else if (selectedAction.value === 'Cambiar') {
+    modalCambiarServicioOpen.value = true;
   } else {
     showToast(`Comando "${selectedAction.value}" disponible.`);
   }
@@ -275,8 +412,14 @@ const confirmarEjecucionNiveles = () => {
   showToast('Comando NIVELES aplicado correctamente.', 'success');
 };
 
+const confirmarCambiarServicio = () => {
+  modalCambiarServicioOpen.value = false;
+  ejecutarComandoCambiarServicio(1);
+  showToast('Ejecución de Comando: CAMBIAR_SERVICIO exitoso', 'success');
+};
+
 const handleBack = () => {
-  if (state.softCloseProgress?.nivelesEjecutados) {
+  if (!isBrownfield.value && state.softCloseProgress?.nivelesEjecutados) {
     advanceSoftCloseStep(11);
   }
   showScreen('/inventario-detalle');

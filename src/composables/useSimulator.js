@@ -114,6 +114,19 @@ import {
   useMapaCalorFlow
 } from '../flows/mapa_calor/useMapaCalorFlow.js';
 
+import {
+  brownfieldState,
+  useBrownfieldFlow,
+  resetBrownfieldFlow,
+  setBrownfieldStep,
+  advanceBrownfieldStep,
+  activarOntInternet,
+  verificarDesinstalacionAutomatica,
+  activarTvDeco,
+  activarUltraWifi,
+  ejecutarComandoCambiarServicio
+} from '../flows/brownfield/useBrownfieldFlow.js';
+
 // Restaurar datos guardados
 function initializeState() {
   const saved = loadStoredData();
@@ -150,6 +163,9 @@ function initializeState() {
     }
     if (saved.mapaCalorProgress !== undefined) {
       Object.assign(mapaCalorState, saved.mapaCalorProgress);
+    }
+    if (saved.brownfieldProgress !== undefined) {
+      Object.assign(brownfieldState, saved.brownfieldProgress);
     }
     if (saved.softCloseProgress !== undefined) {
       Object.assign(softCloseState, saved.softCloseProgress);
@@ -231,7 +247,8 @@ export const state = reactive({
   get desplazamientoProgress() { return desplazamientoState; },
   get cierreProgress() { return cierreState; },
   get planillaNotasProgress() { return planillaNotasState; },
-  get mapaCalorProgress() { return mapaCalorState; }
+  get mapaCalorProgress() { return mapaCalorState; },
+  get brownfieldProgress() { return brownfieldState; }
 });
 
 // Guardado reactivo en segundo plano ante cualquier cambio
@@ -250,7 +267,8 @@ watch(
     desplazamientoState,
     cierreState,
     planillaNotasState,
-    mapaCalorState
+    mapaCalorState,
+    brownfieldState
   ],
   () => {
     saveStoredData(() => ({
@@ -268,7 +286,8 @@ watch(
       desplazamientoProgress: desplazamientoState,
       cierreProgress: cierreState,
       planillaNotasProgress: planillaNotasState,
-      mapaCalorProgress: mapaCalorState
+      mapaCalorProgress: mapaCalorState,
+      brownfieldProgress: brownfieldState
     }));
   },
   { deep: true }
@@ -336,6 +355,9 @@ export function useSimulator() {
     resetActivacionRutaFlow();
     resetAlmacenFlow();
     resetDesplazamientoFlow();
+    resetCierreFlow();
+    resetPlanillaNotasFlow();
+    resetBrownfieldFlow();
     showToast('Simulador restablecido a los valores iniciales de prueba.', 'info');
     showScreen('/activities');
   };
@@ -411,6 +433,9 @@ export function useSimulator() {
     enviarMensajePrivado,
     // Métodos de Mapa de Calor (App H&B)
     mapaCalorState,
-    ...useMapaCalorFlow()
+    ...useMapaCalorFlow(),
+    // Métodos de Proceso Brownfield
+    brownfieldState,
+    ...useBrownfieldFlow()
   };
 }

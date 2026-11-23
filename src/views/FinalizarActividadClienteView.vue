@@ -220,6 +220,7 @@
 import { computed } from 'vue';
 import { useSimulator } from '../composables/useSimulator';
 import { useCierreFlow } from '../flows/cierre/useCierreFlow';
+import { validarFormularioCierreOT, ejecutarValidacionConFeedback } from '../core/businessRules';
 import FlowHintBox from '../components/FlowHintBox.vue';
 
 const { state, showScreen, showToast } = useSimulator();
@@ -236,6 +237,9 @@ const onCapturarCoordenadas = () => {
 };
 
 const handleCompletar = () => {
+  const valForm = validarFormularioCierreOT();
+  if (!ejecutarValidacionConFeedback(valForm)) return;
+
   completarOrdenTrabajo(() => {
     // Redirige a la lista de actividades donde ahora aparece en el grupo "Cerrado"
     showScreen('/activities');

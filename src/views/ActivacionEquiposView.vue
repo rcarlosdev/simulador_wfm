@@ -18,6 +18,11 @@
     </div>
 
     <!-- Mensajes de Información del Sistema -->
+    <div class="ofsc-alert-box ofsc-alert-warning" v-if="showWarningBrownfield">
+      <span class="alert-icon">⚠</span>
+      <span><strong>Advertencia:</strong> La orden es una migracion por favor instale el MTA/ONT en el servicio de internet correspondiente y valide que el resultado de la activacion sea exitoso</span>
+    </div>
+
     <div class="ofsc-alert-box ofsc-alert-info" v-if="showAlertCheckUbicacion">
       <span class="alert-icon">ℹ</span>
       <span>Informacion: Debe seleccionar el check de ubicaciones para seleccionar ubicacion</span>
@@ -223,6 +228,7 @@
               <span class="select-arrow">▼</span>
             </div>
             <div class="ofsc-select-dropdown" v-if="tvPredioDropdownOpen" style="display:block;">
+              <div class="select-drop-option" @click="onChooseTvPredio('Alcoba Principal')">Alcoba Principal</div>
               <div class="select-drop-option" @click="onChooseTvPredio('Alcoba Auxiliar 1')">Alcoba Auxiliar 1</div>
               <div class="select-drop-option" @click="onChooseTvPredio('Alcoba Auxiliar 2')">Alcoba Auxiliar 2</div>
               <div class="select-drop-option" @click="onChooseTvPredio('Alcoba Auxiliar 3')">Alcoba Auxiliar 3</div>
@@ -493,6 +499,7 @@
               <span class="select-arrow">▼</span>
             </div>
             <div class="ofsc-select-dropdown" v-if="intPredioDropdownOpen" style="display:block;">
+              <div class="select-drop-option" @click="onChooseIntPredio('Alcoba Principal')">Alcoba Principal</div>
               <div class="select-drop-option" @click="onChooseIntPredio('Alcoba Auxiliar 1')">Alcoba Auxiliar 1</div>
               <div class="select-drop-option" @click="onChooseIntPredio('Alcoba Auxiliar 2')">Alcoba Auxiliar 2</div>
               <div class="select-drop-option" @click="onChooseIntPredio('Sala')">Sala</div>
@@ -594,6 +601,12 @@
               <span class="select-arrow">▼</span>
             </div>
             <div class="ofsc-select-dropdown" v-if="intFuenteDropdownOpen" style="display:block;">
+              <div class="select-drop-option" @click="onChooseIntFuente('CABLE DE PODER INTEGRADO')">
+                CABLE DE PODER INTEGRADO
+              </div>
+              <div class="select-drop-option" @click="onChooseIntFuente('FUENTE 12V 1000MA')">
+                FUENTE 12V 1000MA
+              </div>
               <div class="select-drop-option" @click="onChooseIntFuente('FUENTE 12V 2500MA 2.5X5.5X9.5MM')">
                 FUENTE 12V 2500MA 2.5X5.5X9.5MM
               </div>
@@ -716,10 +729,27 @@
 import { ref, computed } from 'vue';
 import { useSimulator } from '../composables/useSimulator';
 import FlowHintBox from '../components/FlowHintBox.vue';
+import { validarReglaMigracionBrownfield, BUSINESS_ERROR_CODES } from '../core/businessRules.js';
 
-const { state, showScreen, showToast, openDrawer } = useSimulator();
+const {
+  state,
+  showScreen,
+  showToast,
+  openDrawer,
+  openModal,
+  activarOntInternet,
+  activarTvDeco,
+  activarUltraWifi
+} = useSimulator();
 
 const prog = state.activacionProgress;
+
+// Detección de Actividad Brownfield (Migración)
+const isBrownfield = computed(() => {
+  return state.currentActivity?.subtipo === 'BROWNFIELD' || state.currentActivity?.isBrownfield === true;
+});
+
+const showWarningBrownfield = ref(false);
 
 // Control de pasos progresivos respaldados en state
 const stepNumber = computed({
@@ -742,8 +772,25 @@ const selectedServiceLabel = computed(() => {
   return '';
 });
 
-// Al elegir el servicio en el select desplegable, se desbloquea el Paso 2
+// Al elegir el servicio en el select desplegable, se valida la regla de oro Brownfield
 const onSelectServiceOption = (srv) => {
+  if (isBrownfield.value && !state.brownfieldProgress?.ontInstalada) {
+    if (srv === 'tv' || srv === 'desinst') {
+      showWarningBrownfield.value = true;
+      openModal(
+        'Advertencia OFSC - Migración Brownfield',
+        `<div style="font-size:0.86rem;line-height:1.55;color:#f5f5f5;">
+           <strong>Advertencia:</strong> La orden es una migracion por favor instale el MTA/ONT en el servicio de internet correspondiente y valide que el resultado de la activacion sea exitoso
+         </div>`,
+        null,
+        'Entendido'
+      );
+      serviceDropdownOpen.value = false;
+      return;
+    }
+  }
+
+  showWarningBrownfield.value = false;
   selectedService.value = srv;
   serviceDropdownOpen.value = false;
   if (srv === 'desinst') {
@@ -777,10 +824,17 @@ const ubicacionTvSelected = computed({
 });
 const ubicacionTvDropdownOpen = ref(false);
 
-const tvServiciosList = [
-  { id: 1, nombre: '1- TV DIGI PLUS;ARR DECO', tipo: 'ADI' },
-  { id: 2, nombre: '2- TV DIGI PLUS;ARR DECO', tipo: 'ADI' }
-];
+const tvServiciosList = computed(() => {
+  if (isBrownfield.value) {
+    return [
+      { id: 4, nombre: '4 - ARR DECO ADI;TV IP DIG PL', tipo: 'ADI' }
+    ];
+  }
+  return [
+    { id: 1, nombre: '1- TV DIGI PLUS;ARR DECO', tipo: 'ADI' },
+    { id: 2, nombre: '2- TV DIGI PLUS;ARR DECO', tipo: 'ADI' }
+  ];
+});
 const selectedTvServicioId = computed({
   get: () => prog.selectedTvServicioId,
   set: (v) => { prog.selectedTvServicioId = v; }
@@ -791,7 +845,7 @@ const tvModificarUbicacion = computed({
   set: (v) => { prog.tvModificarUbicacion = v; }
 });
 const tvPredioUbicacion = computed({
-  get: () => prog.tvPredioUbicacion || 'Alcoba Auxiliar 1',
+  get: () => prog.tvPredioUbicacion || (isBrownfield.value ? 'Alcoba Principal' : 'Alcoba Auxiliar 1'),
   set: (v) => { prog.tvPredioUbicacion = v; }
 });
 const tvPredioDropdownOpen = ref(false);
@@ -805,24 +859,31 @@ const selectedTvDecoSerial = computed({
   set: (v) => { prog.selectedTvDecoSerial = v; }
 });
 
-const tvDecosList = [
-  // 8 Decodificadores Base (DVB / Tradicionales)
-  { serial: '610120818136', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818136 - 022D2197 - TECH', extra: false },
-  { serial: '00824416060029714', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029714 - 0727C35F - TECH', extra: false },
-  { serial: '601391700073530', label: 'DBV_NEW - NEW - NL5101-E - 601391700073530 - 01D40D8F - TECH', extra: false },
-  { serial: '9670119050130360', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119050130360 - 0177FAA4 - TECH', extra: false },
-  { serial: '9670119010085296', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119010085296 - 016A5B85 - TECH', extra: false },
-  { serial: '601391700073612', label: 'DBV_NEW - NEW - NL5101-E - 601391700073612 - 01D40E10 - TECH', extra: false },
-  { serial: '610120818240', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818240 - 022D2205 - TECH', extra: false },
-  { serial: '00824416060029830', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029830 - 0727C410 - TECH', extra: false },
-  // 3 Decodificadores Adicionales (IPTV) con 'Mostrar más tecnologías' (Total 11)
-  { serial: '254419362225', label: 'ITV_N2P - N2P - NL 6105RC - 254419362225 - 3754F11631 - A8:F4:70:C1:6D:A5 - TECH', extra: true },
-  { serial: '254425484764', label: 'ITV_N2P - N2P - NL 6105RC - 254425484764 - 37555E55C5 - A8:F4:70:C2:84:89 - TECH', extra: true },
-  { serial: '254871678602', label: 'ITV_NIP - NIP - NL 6105RB - 254871678602 - 378EDC2951 - A8:F4:70:EC:E3:94 - TECH', extra: true }
-];
+const tvDecosList = computed(() => {
+  if (isBrownfield.value) {
+    return [
+      { serial: '230619887780', label: 'ITV_JIP - JIP - DTC9432 - 230619887780 - 82580F21 - 00:15:c0:7d:17:9f - TECH', extra: false }
+    ];
+  }
+  return [
+    // 8 Decodificadores Base (DVB / Tradicionales)
+    { serial: '610120818136', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818136 - 022D2197 - TECH', extra: false },
+    { serial: '00824416060029714', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029714 - 0727C35F - TECH', extra: false },
+    { serial: '601391700073530', label: 'DBV_NEW - NEW - NL5101-E - 601391700073530 - 01D40D8F - TECH', extra: false },
+    { serial: '9670119050130360', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119050130360 - 0177FAA4 - TECH', extra: false },
+    { serial: '9670119010085296', label: 'DBV_JZ3 - JZ3 - DTC9638PLUS - 9670119010085296 - 016A5B85 - TECH', extra: false },
+    { serial: '601391700073612', label: 'DBV_NEW - NEW - NL5101-E - 601391700073612 - 01D40E10 - TECH', extra: false },
+    { serial: '610120818240', label: 'DBV_ZT3 - ZT3 - ZAPPER ZXV10 - 610120818240 - 022D2205 - TECH', extra: false },
+    { serial: '00824416060029830', label: 'DBV_CH2 - CH2 - N8771C - 00824416060029830 - 0727C410 - TECH', extra: false },
+    // 3 Decodificadores Adicionales (IPTV) con 'Mostrar más tecnologías' (Total 11)
+    { serial: '254419362225', label: 'ITV_N2P - N2P - NL 6105RC - 254419362225 - 3754F11631 - A8:F4:70:C1:6D:A5 - TECH', extra: true },
+    { serial: '254425484764', label: 'ITV_N2P - N2P - NL 6105RC - 254425484764 - 37555E55C5 - A8:F4:70:C2:84:89 - TECH', extra: true },
+    { serial: '254871678602', label: 'ITV_NIP - NIP - NL 6105RB - 254871678602 - 378EDC2951 - A8:F4:70:EC:E3:94 - TECH', extra: true }
+  ];
+});
 
 const tvDecosFiltrados = computed(() => {
-  return tvMostrarMasTec.value ? tvDecosList : tvDecosList.filter(d => !d.extra);
+  return tvMostrarMasTec.value ? tvDecosList.value : tvDecosList.value.filter(d => !d.extra);
 });
 
 const selectedTvControl = computed({
@@ -838,7 +899,17 @@ const tvTarjetasMostrarMasTec = computed({
 
 // Tarjetas Virtuales: coinciden exactamente 1 a 1 con los Decos cambiando el último dígito por 'V'
 const tvTarjetasList = computed(() => {
-  return tvDecosList.map(deco => {
+  if (isBrownfield.value) {
+    return [
+      {
+        serial: '23061988778V',
+        label: 'CAR_NGR - NGR - NGR - 23061988778V - - - TECH',
+        extra: false,
+        decoSerial: '230619887780'
+      }
+    ];
+  }
+  return tvDecosList.value.map(deco => {
     const cardSerial = deco.serial.slice(0, -1) + 'V';
     return {
       serial: cardSerial,
@@ -908,9 +979,22 @@ const ubicacionIntSelected = computed({
 });
 const ubicacionIntDropdownOpen = ref(false);
 
-const intServiciosList = [
-  { id: 10, nombre: '3- INT 5+95 MB;MODEM WIFI;TELEFONIA - +576019353116' }
-];
+const intServiciosList = computed(() => {
+  if (isBrownfield.value) {
+    if (!state.brownfieldProgress?.ontInstalada) {
+      return [
+        { id: 10, nombre: '10 - INT150+150MB;MODEM WIFI;TELEF LOC FO -' }
+      ];
+    } else {
+      return [
+        { id: 1, nombre: '1 - SRV ULTRAWIF' }
+      ];
+    }
+  }
+  return [
+    { id: 10, nombre: '3- INT 5+95 MB;MODEM WIFI;TELEFONIA - +576019353116' }
+  ];
+});
 const selectedIntServicioId = computed({
   get: () => prog.selectedIntServicioId,
   set: (v) => { prog.selectedIntServicioId = v; }
@@ -921,7 +1005,7 @@ const intModificarUbicacion = computed({
   set: (v) => { prog.intModificarUbicacion = v; }
 });
 const intPredioUbicacion = computed({
-  get: () => prog.intPredioUbicacion || 'Alcoba Auxiliar 2',
+  get: () => prog.intPredioUbicacion || (isBrownfield.value ? 'Alcoba Principal' : 'Alcoba Auxiliar 2'),
   set: (v) => { prog.intPredioUbicacion = v; }
 });
 const intPredioDropdownOpen = ref(false);
@@ -935,14 +1019,27 @@ const selectedModemSerial = computed({
   set: (v) => { prog.selectedModemSerial = v; }
 });
 
-const modemsList = [
-  { serial: 'B4:8D:C7:EE:DF:54', label: 'MTA 41T - DPC3941 - B4:8D:C7:EE:DF:54 - TECH', extra: false },
-  { serial: '38:3F:B3:97:5C:1B', label: 'MTA_CG1 - CGA0112 - 38:3F:B3:97:5C:1B - TECH', extra: true },
-  { serial: '48:4B:D4:04:3A:BB', label: 'MTA_CG1 - CGA0112 - 48:4B:D4:04:3A:BB - TECH', extra: true }
-];
+const modemsList = computed(() => {
+  if (isBrownfield.value) {
+    if (!state.brownfieldProgress?.ontInstalada) {
+      return [
+        { serial: 'C0:94:AD:45:B2:98', label: 'CPE_FZG - FZG - F680 - C0:94:AD:45:B2:98 -- ZT:EG:CE:85:EF:69 - 2 - TECH', extra: false }
+      ];
+    } else {
+      return [
+        { serial: '695DDE8910F48BD5', label: 'CPE_FHS - FHS - MESHFRSR120C - 695DDE8910F48BD5 - - 2 - TECH', extra: false }
+      ];
+    }
+  }
+  return [
+    { serial: 'B4:8D:C7:EE:DF:54', label: 'MTA 41T - DPC3941 - B4:8D:C7:EE:DF:54 - TECH', extra: false },
+    { serial: '38:3F:B3:97:5C:1B', label: 'MTA_CG1 - CGA0112 - 38:3F:B3:97:5C:1B - TECH', extra: true },
+    { serial: '48:4B:D4:04:3A:BB', label: 'MTA_CG1 - CGA0112 - 48:4B:D4:04:3A:BB - TECH', extra: true }
+  ];
+});
 
 const modemsListFiltrados = computed(() => {
-  return intMostrarMasTec.value ? modemsList : modemsList.filter(m => !m.extra);
+  return intMostrarMasTec.value ? modemsList.value : modemsList.value.filter(m => !m.extra);
 });
 
 const selectedIntLinea = computed({
@@ -1011,6 +1108,9 @@ const confirmInstalarServicios = () => {
   if (pendingServiceToInstall.value === 'tv') {
     showToast('Enviando comandos de activación TV a OFSC...', 'normal');
     setTimeout(() => {
+      if (isBrownfield.value) {
+        activarTvDeco();
+      }
       showAlertServiciosAsocOk.value = true;
       showToast('✓ Servicios de televisión asociados correctamente.', 'success');
       // Desbloquea la invitación al siguiente servicio (Internet)
@@ -1020,12 +1120,27 @@ const confirmInstalarServicios = () => {
   } else if (pendingServiceToInstall.value === 'int') {
     showToast('Enviando comandos de activación Internet a OFSC...', 'normal');
     setTimeout(() => {
-      showAlertServiciosInstOfsc.value = true;
-      showToast('✓ Servicios instalados en OFSC correctamente.', 'success');
-      stepNumber.value = 99; // Pantalla final de certificación exitosa
-      if (state.currentActivity) {
-        state.currentActivity.equiposInstalados = true;
-        state.currentActivity.serviciosActivados = true;
+      if (isBrownfield.value) {
+        if (!state.brownfieldProgress?.ontInstalada) {
+          activarOntInternet();
+          showAlertServiciosInstOfsc.value = true;
+          showToast('✓ MTA/ONT instalado en OFSC correctamente.', 'success');
+          selectedService.value = null;
+          stepNumber.value = 1;
+        } else {
+          activarUltraWifi();
+          showAlertServiciosInstOfsc.value = true;
+          showToast('✓ Extensor UltraWiFi Mesh instalado correctamente.', 'success');
+          stepNumber.value = 99;
+        }
+      } else {
+        showAlertServiciosInstOfsc.value = true;
+        showToast('✓ Servicios instalados en OFSC correctamente.', 'success');
+        stepNumber.value = 99; // Pantalla final de certificación exitosa
+        if (state.currentActivity) {
+          state.currentActivity.equiposInstalados = true;
+          state.currentActivity.serviciosActivados = true;
+        }
       }
     }, 600);
   }
@@ -1066,6 +1181,54 @@ const currentStepTitle = computed(() => {
 });
 
 const currentHintText = computed(() => {
+  // Pistas exclusivas para Actividad Brownfield
+  if (isBrownfield.value) {
+    if (!state.brownfieldProgress?.ontInstalada) {
+      if (stepNumber.value === 1) {
+        return '⚠️ <strong>Regla de Oro Brownfield:</strong> En una migración, debes instalar el <strong>MTA/ONT</strong> en el servicio de <strong>Internet/Telefonia</strong> PRIMERO. Si seleccionas TV o Desinstalación, el sistema bloqueará la activación.';
+      }
+      if (selectedService.value === 'int') {
+        if (stepNumber.value === 2) return 'Selecciona ubicación <strong>Default</strong> para la ONT FTTH.';
+        if (stepNumber.value === 3) return 'Selecciona el servicio <strong>10 - INT150+150MB;MODEM WIFI;TELEF LOC FO -</strong>.';
+        if (stepNumber.value === 4) return 'Activa <strong>Modificar Ubicación</strong> y selecciona <strong>Alcoba Principal</strong>.';
+        if (stepNumber.value === 5) return 'Selecciona la ONT <strong>CPE_FZG - FZG - F680 - C0:94:AD:45:B2:98...</strong>.';
+        if (stepNumber.value === 6) return 'Confirma o selecciona la línea asociada.';
+        if (stepNumber.value === 7) return 'Selecciona <strong>CABLE DE PODER INTEGRADO</strong>.';
+        if (stepNumber.value === 8) return 'Presiona <strong>Activar Servicios</strong> para instalar la ONT.';
+      }
+    } else if (!state.brownfieldProgress?.desinstalacionAutomaticaVerificada) {
+      return '✓ MTA/ONT instalado exitosamente. Ahora regresa a detalles y entra a <strong>Inventario</strong> para verificar que los equipos viejos se hayan <strong>desinstalado automáticamente</strong>.';
+    } else if (!state.brownfieldProgress?.tvInstalada) {
+      if (stepNumber.value === 1) {
+        return 'Desinstalación automática verificada. Ahora despliega el menú y selecciona <strong>Television</strong> para asociar el decodificador nuevo (DTC9432).';
+      }
+      if (selectedService.value === 'tv') {
+        if (stepNumber.value === 2) return 'Selecciona ubicación <strong>Default</strong> para el decodificador.';
+        if (stepNumber.value === 3) return 'Selecciona el servicio <strong>4 - ARR DECO ADI;TV IP DIG PL</strong>.';
+        if (stepNumber.value === 4) return 'Activa <strong>Modificar Ubicación</strong> y elige <strong>Alcoba Principal</strong>.';
+        if (stepNumber.value === 5) return 'Selecciona el decodificador <strong>ITV_JIP - JIP - DTC9432 - 230619887780...</strong>.';
+        if (stepNumber.value === 6) return 'Asocia el control remoto <strong>Universal DVB</strong>.';
+        if (stepNumber.value === 7) return 'Selecciona la tarjeta virtual <strong>CAR_NGR (23061988778V)</strong>.';
+        if (stepNumber.value === 8) return 'Presiona <strong>Activar Servicios</strong>.';
+      }
+    } else if (!state.brownfieldProgress?.ultraWifiInstalado) {
+      if (stepNumber.value === 1) {
+        return 'Decodificador TV instalado. Ahora selecciona <strong>Internet/Telefonia</strong> para instalar el servicio adicional <strong>UltraWiFi Mesh</strong>.';
+      }
+      if (selectedService.value === 'int') {
+        if (stepNumber.value === 2) return 'Selecciona ubicación <strong>Default</strong>.';
+        if (stepNumber.value === 3) return 'Selecciona el servicio <strong>1 - SRV ULTRAWIF</strong>.';
+        if (stepNumber.value === 4) return 'Activa <strong>Modificar Ubicación</strong> y elige <strong>Alcoba Auxiliar 1</strong>.';
+        if (stepNumber.value === 5) return 'Selecciona el equipo <strong>CPE_FHS - FHS - MESHFRSR120C - 695DDE8910F48BD5...</strong>.';
+        if (stepNumber.value === 6 || stepNumber.value === 7) return 'Continúa con la fuente de poder compatible.';
+        if (stepNumber.value === 8) return 'Presiona <strong>Activar Servicios</strong>.';
+      }
+    } else if (!state.brownfieldProgress?.reutilizacionComandoEjecutado) {
+      return 'Todos los equipos nuevos están instalados. Ahora regresa a <strong>Inventario</strong>, selecciona el equipo cliente <strong>ITV N2P 6 (254889543645)</strong> y ejecuta el comando <strong>Cambiar servicio</strong>.';
+    }
+  }
+
+  // Flujo Estándar HFC / DTH
   if (stepNumber.value === 1) {
     if (showAlertServiciosAsocOk.value) {
       return '¡Servicios TV asociados! Ahora despliega el selector y elige <strong>Internet/Telefonia</strong> para continuar.';
