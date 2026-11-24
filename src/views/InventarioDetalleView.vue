@@ -18,7 +18,7 @@
         <button
           type="button"
           class="app-bar-btn btn-dots"
-          :class="{ 'btn-highlight': isBrownfield ? (!state.brownfieldProgress?.reutilizacionComandoEjecutado) : (currentStep === 6 || currentStep === 11) }"
+          :class="{ 'btn-highlight': isBrownfield ? (state.brownfieldProgress?.iniciado && !state.brownfieldProgress?.reutilizacionComandoEjecutado) : (state.softCloseProgress?.iniciado && (currentStep === 6 || currentStep === 11)) }"
           title="Menú de opciones"
           @click="toggleMenu"
         >
@@ -31,7 +31,7 @@
     <div v-if="menuOpen" class="inv-dropdown-menu" @click.stop>
       <div
         class="inv-dropdown-item"
-        :class="{ 'item-target': !isBrownfield && currentStep === 12 }"
+        :class="{ 'item-target': !isBrownfield && state.softCloseProgress?.iniciado && currentStep === 12 }"
         @click="irAAcciones"
       >
         Acciones
@@ -41,7 +41,7 @@
       </div>
       <div
         class="inv-dropdown-item"
-        :class="{ 'item-target': isBrownfield ? (!state.brownfieldProgress?.reutilizacionComandoEjecutado) : (currentStep === 6) }"
+        :class="{ 'item-target': isBrownfield ? (state.brownfieldProgress?.iniciado && !state.brownfieldProgress?.reutilizacionComandoEjecutado) : (state.softCloseProgress?.iniciado && currentStep === 6) }"
         @click="irAComandos"
       >
         Comandos Activacion
@@ -189,7 +189,7 @@
           Parámetros Técnicos
         </div>
 
-        <div class="tech-param-card" :class="{ 'card-target': currentStep === 16 }">
+        <div class="tech-param-card" :class="{ 'card-target': state.softCloseProgress?.iniciado && currentStep === 16 }">
           <div class="tech-param-header">
             <span class="tech-param-name">RX</span>
             <span class="tech-param-val">-1.7 dBm</span>
@@ -228,7 +228,7 @@
 
     <!-- Pistas Flotantes según el Paso -->
     <!-- Flujo Brownfield (Reutilización de equipo cliente) -->
-    <template v-if="isBrownfield">
+    <template v-if="isBrownfield && state.brownfieldProgress?.iniciado">
       <FlowHintBox
         v-if="!menuOpen && !state.brownfieldProgress?.reutilizacionComandoEjecutado"
         step="5"
@@ -252,7 +252,7 @@
     </template>
 
     <!-- Flujo Estándar HFC (SoftClose) -->
-    <template v-else>
+    <template v-else-if="!isBrownfield && state.softCloseProgress?.iniciado">
       <!-- Paso 6 (SotfClose.pdf Pág 5) -->
       <FlowHintBox
         v-if="currentStep === 6 && !menuOpen"
@@ -304,7 +304,7 @@ const { state, showScreen, showToast, advanceSoftCloseStep } = useSimulator();
 
 const menuOpen = ref(false);
 const isBrownfield = computed(() => state.currentActivity?.subtipo === 'BROWNFIELD' || state.currentActivity?.isBrownfield === true);
-const currentStep = computed(() => state.softCloseProgress?.currentStep || 6);
+const currentStep = computed(() => state.softCloseProgress?.currentStep || 0);
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value;

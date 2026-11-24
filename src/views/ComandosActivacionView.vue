@@ -5,7 +5,7 @@
       <button
         type="button"
         class="app-bar-btn"
-        :class="{ 'btn-highlight': currentStep === 10 }"
+        :class="{ 'btn-highlight': state.softCloseProgress?.iniciado && currentStep === 10 }"
         title="Volver"
         @click="handleBack"
       >
@@ -104,7 +104,7 @@
           <select
             class="cmd-select-control"
             :class="{
-              'select-target': (!isBrownfield && currentStep === 8) || (isBrownfield && !state.brownfieldProgress?.reutilizacionComandoEjecutado)
+              'select-target': (!isBrownfield && state.softCloseProgress?.iniciado && currentStep === 8) || (isBrownfield && state.brownfieldProgress?.iniciado && !state.brownfieldProgress?.reutilizacionComandoEjecutado)
             }"
             v-model="selectedAction"
             @change="handleActionChange"
@@ -306,7 +306,7 @@
           <button
             type="button"
             class="cmd-btn-execute"
-            :class="{ 'btn-highlight': isBrownfield && !state.brownfieldProgress?.reutilizacionComandoEjecutado }"
+            :class="{ 'btn-highlight': isBrownfield && state.brownfieldProgress?.iniciado && !state.brownfieldProgress?.reutilizacionComandoEjecutado }"
             @click="confirmarCambiarServicio"
           >
             Ejecutar
@@ -317,7 +317,7 @@
 
     <!-- PISTAS FLOTANTES -->
     <!-- Flujo Brownfield (Comando Cambiar Servicio) -->
-    <template v-if="isBrownfield">
+    <template v-if="isBrownfield && state.brownfieldProgress?.iniciado">
       <FlowHintBox
         v-if="!state.brownfieldProgress?.reutilizacionComandoEjecutado && !modalCambiarServicioOpen"
         step="5"
@@ -341,7 +341,7 @@
     </template>
 
     <!-- Flujo Estándar HFC (Niveles SoftClose) -->
-    <template v-else>
+    <template v-else-if="!isBrownfield && state.softCloseProgress?.iniciado">
       <!-- Paso 8 (SotfClose.pdf Pág 8) -->
       <FlowHintBox
         v-if="currentStep === 8 && !modalNivelesOpen"
@@ -392,7 +392,7 @@ const selectedAction = ref(
 const modalNivelesOpen = ref(false);
 const modalCambiarServicioOpen = ref(false);
 
-const currentStep = computed(() => state.softCloseProgress?.currentStep || 8);
+const currentStep = computed(() => state.softCloseProgress?.currentStep || 0);
 
 const handleActionChange = () => {
   if (selectedAction.value === 'Niveles') {

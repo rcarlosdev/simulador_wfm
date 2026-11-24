@@ -28,7 +28,7 @@
           type="button"
           class="btn-icon-mensaje-header"
           :class="{
-            'btn-tutorial-highlight': planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'
+            'btn-tutorial-highlight': planillaNotasState.iniciado && planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'
           }"
           title="Mensajería"
           aria-label="Mensajería"
@@ -58,7 +58,7 @@
         <!-- Item 1: DELTA ALIADO EZENTIS (Paso 3) -->
         <div
           class="colab-chat-item"
-          :class="{ 'item-target-highlight': planillaNotasState.currentStep === 3 }"
+          :class="{ 'item-target-highlight': planillaNotasState.iniciado && planillaNotasState.currentStep === 3 }"
           @click="seleccionarChatDelta"
         >
           <div class="chat-item-avatar-line">
@@ -265,7 +265,7 @@
             type="button"
             class="btn-nueva-conversacion-ofsc"
             :class="{
-              'btn-tutorial-highlight': planillaNotasState.currentStep === 5
+              'btn-tutorial-highlight': planillaNotasState.iniciado && planillaNotasState.currentStep === 5
             }"
             @click="irAChatPrivado"
           >
@@ -354,41 +354,43 @@
     <!-- ====================================================================
          PISTAS FLOTANTES OFICIALES (FlowHintBox)
          ==================================================================== -->
-    <!-- Paso 3 (PLANILLA DE NOTAS.pdf Pág 3) -->
-    <FlowHintBox
-      v-if="planillaNotasState.currentStep === 3 && planillaNotasState.subView === 'lista'"
-      step="3"
-      title="Paso 3 - Selección de Chat"
-    >
-      Selecciona uno de los chats. En este caso, <strong>Delta aliado</strong>.
-    </FlowHintBox>
+    <template v-if="planillaNotasState.iniciado">
+      <!-- Paso 3 (PLANILLA DE NOTAS.pdf Pág 3) -->
+      <FlowHintBox
+        v-if="planillaNotasState.currentStep === 3 && planillaNotasState.subView === 'lista'"
+        step="3"
+        title="Paso 3 - Selección de Chat"
+      >
+        Selecciona uno de los chats. En este caso, <strong>Delta aliado</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 4 (PLANILLA DE NOTAS.pdf Pág 5) -->
-    <FlowHintBox
-      v-else-if="planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'"
-      step="4"
-      title="Paso 4 - Botón de Mensajes"
-    >
-      Luego presiona el botón <strong>Nueva conversación</strong> (<strong>[💬+]</strong>) ubicado en la esquina superior derecha.
-    </FlowHintBox>
+      <!-- Paso 4 (PLANILLA DE NOTAS.pdf Pág 5) -->
+      <FlowHintBox
+        v-else-if="planillaNotasState.currentStep === 4 && planillaNotasState.subView === 'chat_delta_general'"
+        step="4"
+        title="Paso 4 - Botón de Mensajes"
+      >
+        Luego presiona el botón <strong>Nueva conversación</strong> (<strong>[💬+]</strong>) ubicado en la esquina superior derecha.
+      </FlowHintBox>
 
-    <!-- Paso 5 (PLANILLA DE NOTAS.pdf Pág 6) -->
-    <FlowHintBox
-      v-else-if="planillaNotasState.currentStep === 5 && planillaNotasState.subView === 'info_usuario'"
-      step="5"
-      title="Paso 5 - Nueva Conversación"
-    >
-      A continuación, pulsa la opción <strong>Nueva conversación</strong>.
-    </FlowHintBox>
+      <!-- Paso 5 (PLANILLA DE NOTAS.pdf Pág 6) -->
+      <FlowHintBox
+        v-else-if="planillaNotasState.currentStep === 5 && planillaNotasState.subView === 'info_usuario'"
+        step="5"
+        title="Paso 5 - Nueva Conversación"
+      >
+        A continuación, pulsa la opción <strong>Nueva conversación</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 6 (PLANILLA DE NOTAS.pdf Pág 7) -->
-    <FlowHintBox
-      v-else-if="planillaNotasState.currentStep === 6 && planillaNotasState.subView === 'chat_delta_privado'"
-      step="6"
-      title="Paso 6 - Registro de Observaciones"
-    >
-      En este espacio registra las <strong>observaciones</strong> realizadas durante el proceso de instalación y solicita la facturación.
-    </FlowHintBox>
+      <!-- Paso 6 (PLANILLA DE NOTAS.pdf Pág 7) -->
+      <FlowHintBox
+        v-else-if="planillaNotasState.currentStep === 6 && planillaNotasState.subView === 'chat_delta_privado'"
+        step="6"
+        title="Paso 6 - Registro de Observaciones"
+      >
+        En este espacio registra las <strong>observaciones</strong> realizadas durante el proceso de instalación y solicita la facturación.
+      </FlowHintBox>
+    </template>
 
   </div>
 </template>

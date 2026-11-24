@@ -43,7 +43,7 @@
           type="button"
           class="btn-dots-menu"
           :class="{
-            'target-highlight': (!rutaActivada && currentRutaStep === 4) || (actAlmacen?.estado === 'cerrado' && currentDesplazamientoStep === 1) || (cierreState.otCompletada && !cierreState.rutaDesactivada)
+            'target-highlight': (!rutaActivada && currentRutaStep === 4) || (cierreState.otCompletada && !cierreState.rutaDesactivada && cierreState.iniciado)
           }"
           title="Opciones de Lista"
           @click.stop="toggleMenuLista"
@@ -101,8 +101,7 @@
             class="activity-card"
             :class="[
               act.tipo === 'almacen' ? 'color-almacen-pendiente' : 'color-pendiente',
-              { 'card-target-highlight': rutaActivada && currentAlmacenStep === 1 && act.tipo === 'almacen' },
-              { 'card-target-highlight': currentAlmacenStep === 9 && act.tipo === 'cliente' }
+              { 'card-target-highlight': state.almacenProgress?.iniciado && currentAlmacenStep === 1 && act.tipo === 'almacen' }
             ]"
             @click="handleSelectActivity(act)"
           >
@@ -278,7 +277,7 @@
 
     <!-- Paso 3 (ACTIVACION RUTA.pdf Pág 4) -->
     <FlowHintBox
-      v-else-if="calendarioAbierto || (!rutaActivada && currentRutaStep === 3)"
+      v-else-if="!rutaActivada && (calendarioAbierto || currentRutaStep === 3)"
       step="3"
     >
       A continuación, selecciona la fecha en curso, para este caso, <strong>{{ fechaTextoLargoActual }}</strong>.
@@ -292,41 +291,7 @@
       Para el proceso de activación de ruta, pulsa los tres puntos que se encuentran en la parte superior derecha y pulsa la opción <strong>Activar ruta</strong>.
     </FlowHintBox>
 
-    <!-- PISTAS FLOTANTES DEL PROCESO DE ACTIVIDADES DE ALMACÉN -->
-    <!-- Paso 1 (ACTIVIDADES ALMACEN.pdf Pág 2) -->
-    <FlowHintBox
-      v-else-if="rutaActivada && actAlmacen?.estado === 'pendiente' && currentAlmacenStep === 1"
-      step="1"
-    >
-      Una vez hayas ingresado al aplicativo con tus credenciales, pulsa <strong>Actividades de almacén</strong> en la pantalla de inicio.
-    </FlowHintBox>
-
-    <!-- Paso 4 (ACTIVIDADES ALMACEN.pdf Pág 8) -->
-    <FlowHintBox
-      v-else-if="actAlmacen?.estado === 'comenzado' && currentAlmacenStep === 4"
-      step="4"
-    >
-      Pulsa la actividad de almacén en color <strong>verde</strong> que está en la pantalla inicial.
-    </FlowHintBox>
-
-    <!-- Paso 9 (ACTIVIDADES ALMACEN.pdf Pág 18) -->
-    <FlowHintBox
-      v-else-if="actAlmacen?.estado === 'cerrado' && currentAlmacenStep === 9 && currentDesplazamientoStep === 0"
-      step="9"
-    >
-      Una vez hayas finalizado el proceso de actividades de almacén, podrás ver el primer evento en la página principal.
-    </FlowHintBox>
-
-    <!-- PISTAS FLOTANTES DEL PROCESO DE DESPLAZAMIENTO -->
-    <!-- Paso 1 (DESPLAZAMIENTO.pdf Pág 1) -->
-    <FlowHintBox
-      v-else-if="actAlmacen?.estado === 'cerrado' && currentDesplazamientoStep === 1"
-      step="1"
-    >
-      Una vez hayas ingresado al aplicativo con tus credenciales, selecciona los tres puntos ubicados en la parte superior derecha.
-    </FlowHintBox>
-
-    <!-- PISTA FLOTANTE PASO 17 (SoftClose) -->
+    <!-- PISTA FLOTANTE PASO 17 (SoftClose) - Solo si el proceso SoftClose está activo -->
     <FlowHintBox
       v-else-if="state.softCloseProgress?.iniciado && state.softCloseProgress?.currentStep === 17"
       step="17"
@@ -334,9 +299,9 @@
       El aplicativo actualizará los cambios realizados en la OT. Después, en <strong>Lista de actividades</strong>, selecciona la OT del cliente.
     </FlowHintBox>
 
-    <!-- Paso 5 (CIERRE OT y RUTA WFM.pdf Pág 8-9) -->
+    <!-- Paso 5 (CIERRE OT y RUTA WFM.pdf Pág 8-9) - Solo si cierre está activo -->
     <FlowHintBox
-      v-else-if="cierreState.otCompletada && !cierreState.rutaDesactivada"
+      v-else-if="cierreState.iniciado && cierreState.otCompletada && !cierreState.rutaDesactivada"
       step="5"
       title="Paso 5 - Desactivar Ruta"
     >
@@ -535,6 +500,7 @@ const handleSelectActivity = (act) => {
   }
 
   if (act.tipo === 'almacen') {
+    state.almacenProgress.iniciado = true;
     if (act.estado === 'pendiente') {
       advanceAlmacenStep(2);
     } else if (act.estado === 'comenzado') {
@@ -544,8 +510,6 @@ const handleSelectActivity = (act) => {
         advanceAlmacenStep(7);
       }
     }
-  } else if (act.tipo === 'cliente' && act.estado === 'pendiente') {
-    advanceDesplazamientoStep(2);
   }
 
   selectActivity(act);

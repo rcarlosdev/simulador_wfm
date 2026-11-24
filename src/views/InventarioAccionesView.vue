@@ -17,7 +17,7 @@
         <div class="select-wrapper">
           <select
             class="form-control-select"
-            :class="{ 'select-target': currentStep === 13 || currentStep === 14 }"
+            :class="{ 'select-target': state.softCloseProgress?.iniciado && (currentStep === 13 || currentStep === 14) }"
             v-model="tipoSolicitud"
             @change="handleSelectChange"
           >
@@ -58,7 +58,7 @@
         <button
           type="button"
           class="btn-ofs-primary"
-          :class="{ 'btn-highlight': currentStep === 15 }"
+          :class="{ 'btn-highlight': state.softCloseProgress?.iniciado && currentStep === 15 }"
           style="flex: 1; padding: 10px; background: #0277bd; color: #ffffff; border-radius: 4px; font-weight: 700; border: none; cursor: pointer;"
           @click="confirmarAccion"
         >
@@ -67,30 +67,32 @@
       </div>
     </div>
 
-    <!-- PISTAS FLOTANTES -->
-    <!-- Paso 13 (SotfClose.pdf Pág 15) -->
-    <FlowHintBox
-      v-if="currentStep === 13 && tipoSolicitud !== 'Valida Niveles MTA'"
-      step="13"
-    >
-      Luego despliega el menú <strong>Tipo de solicitud</strong>.
-    </FlowHintBox>
+    <!-- PISTAS FLOTANTES (Solo si SoftClose fue iniciado) -->
+    <template v-if="state.softCloseProgress?.iniciado">
+      <!-- Paso 13 (SotfClose.pdf Pág 15) -->
+      <FlowHintBox
+        v-if="currentStep === 13 && tipoSolicitud !== 'Valida Niveles MTA'"
+        step="13"
+      >
+        Luego despliega el menú <strong>Tipo de solicitud</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 14 (SotfClose.pdf Pág 17) -->
-    <FlowHintBox
-      v-else-if="currentStep === 14 || (currentStep === 13 && tipoSolicitud === 'Cambiar Clave de Red')"
-      step="14"
-    >
-      Selecciona la opción <strong>Valida niveles MTA</strong>.
-    </FlowHintBox>
+      <!-- Paso 14 (SotfClose.pdf Pág 17) -->
+      <FlowHintBox
+        v-else-if="currentStep === 14 || (currentStep === 13 && tipoSolicitud === 'Cambiar Clave de Red')"
+        step="14"
+      >
+        Selecciona la opción <strong>Valida niveles MTA</strong>.
+      </FlowHintBox>
 
-    <!-- Paso 15 (SotfClose.pdf Pág 18) -->
-    <FlowHintBox
-      v-else-if="currentStep === 15 || tipoSolicitud === 'Valida Niveles MTA'"
-      step="15"
-    >
-      Confirma la acción haciendo clic sobre <strong>OK</strong>.
-    </FlowHintBox>
+      <!-- Paso 15 (SotfClose.pdf Pág 18) -->
+      <FlowHintBox
+        v-else-if="currentStep === 15 || tipoSolicitud === 'Valida Niveles MTA'"
+        step="15"
+      >
+        Confirma la acción haciendo clic sobre <strong>OK</strong>.
+      </FlowHintBox>
+    </template>
   </div>
 </template>
 
@@ -106,7 +108,7 @@ const tipoSolicitud = ref(
   (state.softCloseProgress?.mtaNivelesValidados ? 'Valida Niveles MTA' : 'Cambiar Clave de Red')
 );
 
-const currentStep = computed(() => state.softCloseProgress?.currentStep || 13);
+const currentStep = computed(() => state.softCloseProgress?.currentStep || 0);
 
 const handleSelectChange = () => {
   state.softCloseProgress.solicitudAccionSelected = tipoSolicitud.value;

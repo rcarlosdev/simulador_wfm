@@ -11,7 +11,6 @@
         </button>
         <div
           class="chat-badge-container btn-open-chat"
-          :class="{ 'target-highlight': act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2 }"
           title="Colaboración / Mensajería"
           @click="irAColaboracion"
         >
@@ -54,10 +53,6 @@
         <button
           type="button"
           class="btn-dots-menu"
-          :class="{
-            'target-highlight': (act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1) ||
-                                (act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3)
-          }"
           title="Opciones (...)"
           @click.stop="handleToggleContextMenu"
         >
@@ -274,14 +269,14 @@
             <div class="context-menu-item" @click="handleAction('ir_a')">Ir a</div>
             <div
               class="context-menu-item"
-              :class="{ 'item-target-highlight': currentDesplazamientoStep === 2 }"
+              :class="{ 'item-target-highlight': state.desplazamientoProgress?.iniciado && currentDesplazamientoStep === 2 }"
               @click="handleAction('mapa')"
             >
               Mapa
             </div>
             <div
               class="context-menu-item"
-              :class="{ 'item-target-highlight': currentDesplazamientoStep === 3 }"
+              :class="{ 'item-target-highlight': state.desplazamientoProgress?.iniciado && currentDesplazamientoStep === 3 }"
               @click="handleAction('navegacion')"
             >
               Navegación
@@ -300,7 +295,7 @@
             <div
               class="context-menu-item"
               :class="{
-                'item-target-highlight': mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3
+                'item-target-highlight': cierreState.iniciado && cierreState.currentStep === 3
               }"
               style="color:#d32f2f;font-weight:700;"
               @click="handleAction('completar')"
@@ -312,9 +307,6 @@
             <div class="context-menu-item" @click="handleAction('ajustar_tiempo')">Ajustar tiempo</div>
             <div
               class="context-menu-item"
-              :class="{
-                'item-target-highlight': act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2
-              }"
               style="color:#81c784;font-weight:700;"
               @click="handleAction('cobertura_wifi')"
             >
@@ -375,22 +367,10 @@
       En el menú de tres puntos (...), pulsa <strong>Completar</strong> para finalizar la actividad de almacén.
     </FlowHintBox>
 
-    <!-- Pistas para actividad Brownfield en estado pendiente -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && (act.subtipo === 'BROWNFIELD' || act.isBrownfield)"
-      step="0"
-      title="Actividad Brownfield - Por Iniciar"
-    >
-      Orden <strong>BROWNFIELD (Migración FTTH)</strong> pendiente. Despliega el menú (···) y a tu discreción puedes:
-      <br>• <strong>Iniciar Desplazamiento</strong> para simular el viaje en Waze/Maps.
-      <br>• <strong>Iniciar actividad (Comenzar en predio)</strong> para empezar de inmediato.
-      <br>• O acceder directamente a <strong>Activacion Servicios</strong> o <strong>Inventario</strong> para repasar el flujo.
-    </FlowHintBox>
-
-    <!-- PISTAS FLOTANTES DEL PROCESO DE DESPLAZAMIENTO -->
+    <!-- PISTAS FLOTANTES DEL PROCESO DE DESPLAZAMIENTO (Solo si el proceso fue iniciado) -->
     <!-- Paso 2 (DESPLAZAMIENTO.pdf Pág 3) -->
     <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && currentDesplazamientoStep === 2"
+      v-else-if="act.tipo !== 'almacen' && state.desplazamientoProgress?.iniciado && currentDesplazamientoStep === 2"
       step="2"
     >
       En el menú desplegable, pulsa la opción <strong>Mapa</strong> para visualizar el lugar de la visita.
@@ -398,7 +378,7 @@
 
     <!-- Paso 3 (DESPLAZAMIENTO.pdf Pág 5) -->
     <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'pendiente' && currentDesplazamientoStep === 3"
+      v-else-if="act.tipo !== 'almacen' && state.desplazamientoProgress?.iniciado && currentDesplazamientoStep === 3"
       step="3"
     >
       También puedes pulsar la opción <strong>Navegación</strong> para visualizar el destino desde la <em>app</em> de tu preferencia.
@@ -410,45 +390,6 @@
       step="18"
     >
       En la OT del cliente, despliega el menú con los tres puntos de la parte superior derecha, y selecciona <strong>SoftClose</strong>.
-    </FlowHintBox>
-
-    <!-- ====================================================================
-         SECUENCIA OPERATIVA: MAPA DE CALOR -> PLANILLA DE NOTAS -> CIERRE OT
-         ==================================================================== -->
-    <!-- 1. Paso 1 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 1) -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 1 && !state.contextMenuOpen"
-      step="1"
-      title="Paso 1 - Menú de Opciones"
-    >
-      En la pantalla <strong>Detalles de actividad</strong>, despliega el menú presionando los <strong>tres puntos</strong> ubicados en la parte superior derecha.
-    </FlowHintBox>
-
-    <!-- 1. Paso 2 Cobertura WiFi (MAPA DE CALOR app H&B.pdf Pág 2) -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && !mapaCalorState.certificacionEnviada && currentMapaCalorStep === 2 && state.contextMenuOpen"
-      step="2"
-      title="Paso 2 - Cobertura Wifi"
-    >
-      En el menú desplegado, selecciona la opción <strong>Cobertura wifi</strong>.
-    </FlowHintBox>
-
-    <!-- 2. Paso 2 Planilla de Notas (PLANILLA DE NOTAS.pdf Pág 1) - Tras certificar Cobertura WiFi -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && !planillaNotasState.planillaEnviada && currentPlanillaStep === 2"
-      step="2"
-      title="Paso 2 - Plantilla de Notas"
-    >
-      Para acceder a la plantilla de notas, pulsa el <strong>botón de mensajería</strong> ubicado en la parte superior derecha.
-    </FlowHintBox>
-
-    <!-- 3. Paso 3 Cierre de OT (CIERRE OT y RUTA WFM.pdf Pág 1) - Tras enviar Planilla de Notas -->
-    <FlowHintBox
-      v-else-if="act.tipo !== 'almacen' && act.estado === 'comenzado' && mapaCalorState.certificacionEnviada && planillaNotasState.planillaEnviada && !cierreState.otCompletada && cierreState.currentStep === 3"
-      step="3"
-      title="Paso 3 - Completar OT"
-    >
-      En el menú de tres puntos (···) de la parte superior derecha, selecciona la opción <strong>Completar</strong>.
     </FlowHintBox>
   </div>
 </template>
@@ -493,7 +434,7 @@ const currentPlanillaStep = computed(() => planillaNotasState.currentStep);
 const currentMapaCalorStep = computed(() => mapaCalorState.currentStep);
 
 const handleToggleContextMenu = () => {
-  if (currentMapaCalorStep.value === 1 && act.value?.estado === 'comenzado') {
+  if (mapaCalorState.iniciado && currentMapaCalorStep.value === 1 && act.value?.estado === 'comenzado') {
     abrirMenuDetalles();
   }
   toggleContextMenu();
@@ -617,14 +558,11 @@ const handleAction = (actionKey) => {
       break;
 
     case 'inventario':
-      if (activity.value?.subtipo !== 'BROWNFIELD' && !activity.value?.isBrownfield) {
-        state.softCloseProgress.iniciado = true;
-        state.softCloseProgress.currentStep = 4;
-      }
       showScreen('/inventario');
       break;
 
     case 'softclose':
+      state.softCloseProgress.iniciado = true;
       advanceSoftCloseStep(19);
       showScreen('/softclose');
       break;
