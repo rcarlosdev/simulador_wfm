@@ -11,6 +11,7 @@ import { reactive } from 'vue';
 
 export function getInitialBrownfieldState() {
   return {
+    iniciado: false, // Solo se activa cuando se inicia la atención de la orden Brownfield
     stepNumber: 1, // 1: ONT Internet, 2: Inventario/Desinstalación, 3: TV, 4: UltraWiFi, 5: Reutilización comando, 6: Cierre
     ontInstalada: false,
     desinstalacionAutomaticaVerificada: false,
@@ -71,6 +72,7 @@ export function advanceBrownfieldStep(step) {
  * Activación exitosa de ONT de Internet (Etapa 1)
  */
 export function activarOntInternet() {
+  brownfieldState.iniciado = true;
   brownfieldState.ontInstalada = true;
   brownfieldState.advertenciaMigracionVisible = false;
   // Agregar ONT a instalados

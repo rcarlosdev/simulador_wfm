@@ -338,18 +338,19 @@ export function useSimulator() {
     resetActivacionRutaFlow();
     resetAlmacenFlow();
     resetDesplazamientoFlow();
+    resetCierreFlow();
+    resetPlanillaNotasFlow();
+    resetBrownfieldFlow();
     showScreen('/login');
     showToast('Sesión cerrada.');
   };
 
   const resetSimulator = () => {
     clearStoredData();
-    const defaultUser = JSON.parse(JSON.stringify(SIMULADOR_DATA.usuarios_prueba[0]));
-    setAuthenticatedUser(defaultUser);
-    if (defaultUser.actividades?.length > 0) {
-      activitiesState.currentActivity = defaultUser.actividades[1] || defaultUser.actividades[0];
-      activitiesState.currentActivityId = activitiesState.currentActivity.id;
-    }
+    authState.currentUser = null;
+    activitiesState.currentActivity = null;
+    activitiesState.currentActivityId = null;
+    uiState.drawerOpen = false;
     resetActivacionFlow();
     resetSoftCloseFlow();
     resetActivacionRutaFlow();
@@ -358,8 +359,8 @@ export function useSimulator() {
     resetCierreFlow();
     resetPlanillaNotasFlow();
     resetBrownfieldFlow();
-    showToast('Simulador restablecido a los valores iniciales de prueba.', 'info');
-    showScreen('/activities');
+    showToast('Simulador restablecido. Inicia sesión para comenzar.', 'info');
+    showScreen('/login');
   };
 
   return {

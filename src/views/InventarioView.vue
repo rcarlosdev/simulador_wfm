@@ -10,7 +10,7 @@
         <button
           type="button"
           class="app-bar-btn btn-refresh-inv"
-          :class="{ 'btn-highlight': isBrownfield && state.brownfieldProgress?.ontInstalada && !state.brownfieldProgress?.desinstalacionAutomaticaVerificada }"
+          :class="{ 'btn-highlight': isBrownfield && state.brownfieldProgress?.iniciado && state.brownfieldProgress?.ontInstalada && !state.brownfieldProgress?.desinstalacionAutomaticaVerificada }"
           title="Actualizar inventarios"
           @click="refrescarInventarios"
         >
@@ -153,7 +153,7 @@
 
         <div
           class="inv-item-card inv-item-clickable"
-          :class="{ 'inv-highlight-target': state.brownfieldProgress?.ultraWifiInstalado && !state.brownfieldProgress?.reutilizacionComandoEjecutado }"
+          :class="{ 'inv-highlight-target': state.brownfieldProgress?.iniciado && state.brownfieldProgress?.ultraWifiInstalado && !state.brownfieldProgress?.reutilizacionComandoEjecutado }"
           @click="seleccionarEquipoClienteBrownfield"
         >
           <div class="inv-item-content">
@@ -267,8 +267,8 @@
     </div>
 
     <!-- Pistas de FlowHintBox -->
-    <!-- Flujo Brownfield -->
-    <template v-if="isBrownfield">
+    <!-- Flujo Brownfield (Solo si el proceso fue iniciado) -->
+    <template v-if="isBrownfield && state.brownfieldProgress?.iniciado">
       <FlowHintBox
         v-if="!state.brownfieldProgress?.ontInstalada"
         step="1"
@@ -314,7 +314,7 @@
 
     <!-- Flujo SoftClose Estándar (Paso 4) -->
     <FlowHintBox
-      v-else-if="state.softCloseProgress?.iniciado && state.softCloseProgress?.currentStep === 4"
+      v-else-if="!isBrownfield && state.softCloseProgress?.iniciado && state.softCloseProgress?.currentStep === 4"
       step="4"
     >
       Valida que los servicios presenten estado <strong>OK</strong>. Luego presiona la opción <strong>MTA</strong>.

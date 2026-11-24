@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 
 const initialState = {
+  iniciado: false, // Solo se activa cuando el usuario abre explícitamente Cobertura WiFi
   currentStep: 1, // Pasos del 1 al 8 según MAPA DE CALOR app H&B.pdf
   menuDetallesAbierto: false,
   plantillaCargada: false, // Paso 4: Mapeado de predio cargado
@@ -41,10 +42,9 @@ export function useMapaCalorFlow() {
 
   // Paso 2: Seleccionar Cobertura Wifi en el menú
   const abrirCoberturaWifi = () => {
+    mapaCalorState.iniciado = true;
     mapaCalorState.menuDetallesAbierto = false;
-    if (mapaCalorState.currentStep === 2) {
-      mapaCalorState.currentStep = 3;
-    }
+    mapaCalorState.currentStep = 3;
   };
 
   // Paso 3 y 4: Seleccionar opción Plantillas y cargar mapeado
