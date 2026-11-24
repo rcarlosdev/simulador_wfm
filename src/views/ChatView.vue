@@ -730,7 +730,7 @@ const handleEnviarMensaje = () => {
 }
 
 .chat-unread-badge {
-  background: #c61d15;
+  background: #ba74e6;
   color: #ffffff;
   font-size: 0.66rem;
   font-weight: 700;
@@ -767,7 +767,7 @@ const handleEnviarMensaje = () => {
 }
 
 .colab-tab-item.active {
-  color: #ef5350;
+  color: #c991ed;
   font-weight: 700;
 }
 
@@ -775,7 +775,7 @@ const handleEnviarMensaje = () => {
   position: absolute;
   top: -4px;
   right: -8px;
-  background: #c61d15;
+  background: #ba74e6;
   color: #ffffff;
   font-size: 0.6rem;
   font-weight: 700;

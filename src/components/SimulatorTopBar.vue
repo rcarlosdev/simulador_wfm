@@ -90,7 +90,7 @@ const { state, toggleFullscreen, resetSimulator, setModoGuiado } = useSimulator(
 }
 
 .btn-mode-tab:last-child.active {
-  background: #c62828;
+  background: #ba74e6;
   color: #ffffff;
 }
 

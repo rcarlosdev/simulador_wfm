@@ -1,9 +1,11 @@
 <template>
   <div class="simulator-screen screen-login screen-active" id="screen-login">
     <div class="login-header-block">
+      <div class="login-brand-banner">
+        <img src="../assets/img/logo-5inco.png" alt="5inco - Compañía Integral Negocios de Colombia" class="login-5inco-logo" />
+      </div>
       <div class="login-title-h1">Iniciar sesión</div>
-      <div class="login-title-brand">Oracle</div>
-      <div class="login-title-service">Field Service</div>
+      <div class="login-title-brand">Oracle <span class="login-title-service">Field Service</span></div>
     </div>
 
     <div class="login-body-block screen-scroll-body">
@@ -69,6 +71,12 @@
           <span class="demo-user-badge">Entrar</span>
         </div>
       </div>
+
+      <!-- Créditos Institucionales 5inco -->
+      <div class="login-footer-credits">
+        <img src="../assets/img/logo-5inco-circle.png" alt="5inco" class="login-footer-circle-logo" />
+        <span class="login-footer-text">5inco WFM · Plataforma de Entrenamiento</span>
+      </div>
     </div>
   </div>
 </template>
@@ -93,3 +101,47 @@ const selectDemo = (user) => {
   login(user.cedula, user.password);
 };
 </script>
+
+<style scoped>
+.login-brand-banner {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-5inco-logo {
+  height: 38px;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.login-footer-credits {
+  text-align: center;
+  margin-top: 24px;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0.85;
+}
+
+.login-footer-circle-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.login-footer-text {
+  font-size: 0.74rem;
+  color: #9e9e9e;
+  letter-spacing: 0.2px;
+}
+</style>

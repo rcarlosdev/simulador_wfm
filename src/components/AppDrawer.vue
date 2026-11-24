@@ -7,11 +7,16 @@
 
   <div class="ofs-drawer" :class="{ 'is-open': state.drawerOpen }">
     <div class="drawer-header">
-      <div class="drawer-user-name">{{ state.currentUser?.nombre || 'TÉCNICO' }}</div>
-      <div class="drawer-user-info">
-        {{ state.currentUser ? `${state.currentUser.cedula} · ${state.currentUser.movil}` : 'Cédula y Móvil' }}
+      <div class="drawer-profile-row">
+        <img src="../assets/img/logo-5inco-circle.png" alt="5inco" class="drawer-profile-avatar" />
+        <div class="drawer-profile-text">
+          <div class="drawer-user-name">{{ state.currentUser?.nombre || 'TÉCNICO' }}</div>
+          <div class="drawer-user-info">
+            {{ state.currentUser ? `${state.currentUser.cedula} · ${state.currentUser.movil}` : 'Cédula y Móvil' }}
+          </div>
+        </div>
       </div>
-      <div class="drawer-user-info" style="color:#ffd54f;margin-top:4px;">Instancia: amx-res-co</div>
+      <div class="drawer-instance-tag">Instancia: amx-res-co · 5inco WFM</div>
     </div>
 
     <!-- Selector de Modo de Simulación en Menú Lateral -->
@@ -58,6 +63,13 @@
       <div class="drawer-item" @click="logout" style="color:#ef5350;">
         <svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
         Cerrar Sesión
+      </div>
+
+      <!-- Pie Corporativo 5inco -->
+      <div class="drawer-footer-brand">
+        <div class="drawer-footer-card">
+          <img src="../assets/img/logo-5inco.png" alt="5inco - Compañía Integral Negocios de Colombia" class="drawer-footer-img" />
+        </div>
       </div>
     </div>
   </div>
@@ -140,9 +152,58 @@ const handleResetSimulator = () => {
 }
 
 .btn-drawer-mode.libre.active {
-  background: #c62828;
+  background: #ba74e6;
   color: #ffffff;
-  border-color: #ef5350;
+  border-color: #c991ed;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.drawer-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drawer-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.drawer-profile-text {
+  overflow: hidden;
+}
+
+.drawer-instance-tag {
+  color: #ffd54f;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.drawer-footer-brand {
+  padding: 16px 14px 20px 14px;
+  margin-top: 14px;
+}
+
+.drawer-footer-card {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.drawer-footer-img {
+  max-height: 28px;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
 }
 </style>

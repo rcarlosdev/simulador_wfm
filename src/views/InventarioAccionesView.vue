@@ -136,9 +136,9 @@ const confirmarAccion = () => {
 
 <style scoped>
 .select-target {
-  background: rgba(198, 40, 40, 0.25) !important;
-  border: 1.5px solid #ef5350 !important;
-  box-shadow: 0 0 10px rgba(239, 83, 80, 0.35);
+  background: rgba(186, 116, 230, 0.25) !important;
+  border: 1.5px solid #ba74e6 !important;
+  box-shadow: 0 0 10px rgba(186, 116, 230, 0.35);
 }
 
 .btn-highlight {

@@ -333,7 +333,7 @@ const confirmarSoftClose = () => {
 
 <style scoped>
 .app-bar-submitting {
-  background: #b71c1c !important;
+  background: #9945cc !important;
 }
 
 .softclose-card {

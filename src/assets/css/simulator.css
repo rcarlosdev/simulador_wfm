@@ -6,9 +6,12 @@
  */
 
 :root {
-  --ofs-red: #c61d15;
-  --ofs-red-dark: #9e140d;
-  --ofs-red-light: #e53935;
+  --ofs-primary: #ba74e6;
+  --ofs-primary-dark: #9945cc;
+  --ofs-primary-light: #c991ed;
+  --ofs-red: #ba74e6;
+  --ofs-red-dark: #9945cc;
+  --ofs-red-light: #c991ed;
   --ofs-bg-dark: #1e1e1e;
   --ofs-bg-darker: #141414;
   --ofs-bg-card: #282828;
@@ -276,7 +279,7 @@ button,
 }
 
 /* ==========================================================================
-   APP BAR ROJA SUPERIOR (ORACLE FIELD SERVICE)
+   APP BAR PRINCIPAL (ORACLE FIELD SERVICE)
    ========================================================================== */
 .ofs-app-bar {
   background: var(--ofs-red);

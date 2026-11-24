@@ -336,7 +336,7 @@
         v-else-if="state.brownfieldProgress?.reutilizacionComandoEjecutado"
         step="5"
       >
-        ✓ ¡Comando CAMBIAR_SERVICIO ejecutado exitosamente! Presiona la flecha atrás en la barra roja superior para volver al inventario.
+        ✓ ¡Comando CAMBIAR_SERVICIO ejecutado exitosamente! Presiona la flecha atrás en la barra superior para volver al inventario.
       </FlowHintBox>
     </template>
 
@@ -561,9 +561,9 @@ const handleBack = () => {
 }
 
 .cmd-select-control.select-target {
-  background: #c62828 !important;
-  border: 1.5px solid #ef5350 !important;
-  box-shadow: 0 0 10px rgba(239, 83, 80, 0.4);
+  background: #9945cc !important;
+  border: 1.5px solid #ba74e6 !important;
+  box-shadow: 0 0 10px rgba(186, 116, 230, 0.4);
 }
 
 .cmd-levels-table {
@@ -732,9 +732,9 @@ const handleBack = () => {
 }
 
 .btn-highlight {
-  background: #ef5350 !important;
+  background: #ba74e6 !important;
   color: #ffffff !important;
-  border-color: #e53935 !important;
+  border-color: #9945cc !important;
   animation: pulseButton 1.5s infinite;
 }
 

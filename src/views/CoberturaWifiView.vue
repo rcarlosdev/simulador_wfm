@@ -1054,7 +1054,7 @@ const finalizarCertificacionYVolver = () => {
 /* Logo Claro al pie */
 .claro-brand-bottom {
   margin-top: auto;
-  background: #c61d15;
+  background: var(--ofs-primary, #ba74e6);
   border-radius: 4px;
   padding: 3px 6px;
   text-align: center;
@@ -1213,14 +1213,14 @@ const finalizarCertificacionYVolver = () => {
 }
 
 .card-tutorial-highlight {
-  border: 2px solid #ef5350 !important;
-  background: rgba(229, 57, 53, 0.25) !important;
+  border: 2px solid #ba74e6 !important;
+  background: rgba(186, 116, 230, 0.25) !important;
   animation: pulseTool 1.5s infinite;
 }
 
 .btn-save-predio {
   width: 100%;
-  background: #c61d15;
+  background: #ba74e6;
   border: none;
   border-radius: 6px;
   color: #ffffff;
@@ -1232,7 +1232,7 @@ const finalizarCertificacionYVolver = () => {
 }
 
 .btn-save-predio:hover {
-  background: #d32f2f;
+  background: #9945cc;
 }
 
 /* Modal Enviando Certificación (Paso 8 - Páginas 8 y 9) */
@@ -1248,7 +1248,7 @@ const finalizarCertificacionYVolver = () => {
 }
 
 .dialog-tutorial-highlight {
-  border: 2px solid #ef5350 !important;
+  border: 2px solid #ba74e6 !important;
   animation: pulseTool 1.5s infinite;
 }
 
@@ -1273,7 +1273,7 @@ const finalizarCertificacionYVolver = () => {
 }
 
 .btn-cert-accept {
-  background: #c61d15;
+  background: #ba74e6;
   border: none;
   border-radius: 6px;
   color: #ffffff;
@@ -1284,6 +1284,6 @@ const finalizarCertificacionYVolver = () => {
 }
 
 .btn-cert-accept:hover {
-  background: #d32f2f;
+  background: #9945cc;
 }
 </style>

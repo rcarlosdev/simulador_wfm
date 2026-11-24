@@ -1,10 +1,13 @@
 <template>
   <div class="simulator-screen screen-activity-list screen-active" id="screen-activity-list">
-    <!-- OFSC App Bar Roja -->
+    <!-- OFSC App Bar Principal -->
     <div class="ofs-app-bar">
-      <button type="button" class="app-bar-btn btn-open-drawer" title="Menú principal (Gestionar)" @click="openDrawer">
-        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-      </button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button type="button" class="app-bar-btn btn-open-drawer" title="Menú principal (Gestionar)" @click="openDrawer">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <img src="../assets/img/logo-5inco-circle.png" alt="5inco" style="width:24px;height:24px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.25);" />
+      </div>
       <div class="app-bar-actions">
         <button type="button" class="app-bar-btn" title="Buscar" @click="showToast('Búsqueda rápida activada')">
           <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -616,10 +619,10 @@ const cerrados = computed(() => actividades.value.filter(a => a.estado === 'cerr
 }
 
 .list-dropdown-item.item-target {
-  background: #ffebee !important;
-  color: #c62828 !important;
+  background: #f3e5f5 !important;
+  color: #ba74e6 !important;
   font-weight: 700;
-  border-left: 3px solid #ef5350;
+  border-left: 3px solid #ba74e6;
 }
 
 /* Pantalla / Modal de Calendario */

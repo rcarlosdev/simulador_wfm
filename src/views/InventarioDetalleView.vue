@@ -390,10 +390,10 @@ const irAListaActividades = () => {
 }
 
 .inv-dropdown-item.item-target {
-  background: rgba(198, 40, 40, 0.3) !important;
-  color: #ffcdd2;
+  background: rgba(186, 116, 230, 0.3) !important;
+  color: #f3e5f5;
   font-weight: 700;
-  border-left: 3px solid #e53935;
+  border-left: 3px solid #ba74e6;
 }
 
 .inv-field-group {

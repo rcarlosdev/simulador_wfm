@@ -15,8 +15,8 @@
       </div>
     </div>
 
-    <!-- Franja Roja Subrayado Oficial -->
-    <div style="height:3px;background:#e53935;width:100%;"></div>
+    <!-- Franja Subrayado Oficial -->
+    <div style="height:3px;background:var(--ofs-primary, #ba74e6);width:100%;"></div>
 
     <!-- Contenido Central Oficial (Página 10 del PDF) -->
     <div class="screen-scroll-body" style="padding:40px 24px 180px 24px;background:#ffffff;color:#222222;min-height:100%;">

@@ -15,8 +15,8 @@
       </div>
     </div>
 
-    <!-- Franja Roja Subrayado Oficial -->
-    <div style="height:3px;background:#e53935;width:100%;"></div>
+    <!-- Franja Subrayado Oficial -->
+    <div style="height:3px;background:var(--ofs-primary, #ba74e6);width:100%;"></div>
 
     <!-- Cuerpo desplazable del formulario -->
     <div class="screen-scroll-body" style="padding:14px 16px 180px 16px;background:#ffffff;color:#222222;">
