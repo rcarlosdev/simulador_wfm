@@ -6,7 +6,9 @@
         <button type="button" class="app-bar-btn btn-open-drawer" title="Menú principal (Gestionar)" @click="openDrawer">
           <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
         </button>
-        <img src="../assets/img/logo-5inco-circle.png" alt="5inco" style="width:24px;height:24px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.25);" />
+        <div class="ofs-app-bar-brand" title="5inco - Compañía Integral Negocios de Colombia">
+          <img src="../assets/img/logo-5inco.png" alt="5inco" class="ofs-app-bar-logo" />
+        </div>
       </div>
       <div class="app-bar-actions">
         <button type="button" class="app-bar-btn" title="Buscar" @click="showToast('Búsqueda rápida activada')">
